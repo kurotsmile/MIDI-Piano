@@ -1,8 +1,12 @@
-﻿using System.Collections;
+﻿using Carrot;
+using System.Collections;
 using UnityEngine;
 
 public class midi_list : MonoBehaviour
 {
+    [Header("Main Obj")]
+    public piano p;
+    [Header("List Midi Obj")]
     public Sprite icon;
     public Sprite icon_list_online;
     public Sprite icon_list_category;
@@ -10,9 +14,10 @@ public class midi_list : MonoBehaviour
     private int leng_midi = 0;
     public GameObject item_midi_prefab;
     private midi_item midi_item_temp;
-    private Carrot.Carrot_Box box_list_midi;
+    private Carrot_Box box_list_midi;
 
     private string s_title_box;
+
     public void check_midi()
     {
         leng_midi = PlayerPrefs.GetInt("leng_m");
@@ -89,15 +94,15 @@ public class midi_list : MonoBehaviour
     public void func_search()
     {
         GetComponent<piano>().set_no_use_keyboar_pc();
-        WWWForm frm_search = GetComponent<piano>().carrot.frm_act("list_midi_online");
-        GetComponent<piano>().carrot.show_search(frm_search, act_done_search, PlayerPrefs.GetString("search_midi_tip", "You can Search for midi songs online, for reference and use for composition purposes"));
+        p.carrot.show_search( Act_done_search, PlayerPrefs.GetString("search_midi_tip", "You can Search for midi songs online, for reference and use for composition purposes"));
     }
 
 
-    private void act_done_search(string s_data)
+    private void Act_done_search(string s_data)
     {
-        act_get_list_midi_online(s_data);
-        Debug.Log("Data search:" + s_data);
+        StructuredQuery q = new(p.carrot.Carrotstore_AppId);
+        q.Add_where("name", Query_OP.EQUAL, s_data);
+        p.carrot.server.Get_doc(q.ToJson(), this.Act_get_list_midi_online_done);
     }
 
     public void delete(int index)
@@ -126,50 +131,57 @@ public class midi_list : MonoBehaviour
         } 
     }
 
-    public void upload_midi(midi_item m_item)
+    public void Upload_midi(midi_item m_item)
     {
-        WWWForm frm = GetComponent<piano>().carrot.frm_act("upload_midi");
-        string s_id_user = GetComponent<piano>().carrot.user.get_id_user_login();
+        midi_item_temp = m_item;
+        string s_id_user = p.carrot.user.get_id_user_login();
+        string s_id_midi = "midi"+p.carrot.generateID();
+        IDictionary data_midi = (IDictionary)Json.Deserialize("{}");
+        data_midi["speed"] = m_item.speed.ToString();
+        data_midi["data_type"] = m_item.s_data_type;
+        data_midi["data_index"] = m_item.s_data_index;
+        data_midi["name_midi"] = m_item.txt_name.text;
+        
         if (s_id_user != "")
         {
-            frm.AddField("user_id", s_id_user);
-            frm.AddField("user_lang", GetComponent<piano>().carrot.user.get_lang_user_login());
+            data_midi["user_id"] = s_id_user;
+            data_midi["user_lang"] = p.carrot.user.get_lang_user_login();
         }
 
-        frm.AddField("name_midi", m_item.txt_name.text);
-
-        frm.AddField("data_index", m_item.s_data_index);
-        frm.AddField("data_type", m_item.s_data_type);
-
-        frm.AddField("speed", m_item.speed.ToString());
-        midi_item_temp = m_item;
-        GetComponent<piano>().carrot.send(frm, act_upload_midi);
+        string s_json=p.carrot.server.Convert_IDictionary_to_json(data_midi);
+        p.carrot.server.Add_Document_To_Collection(p.carrot.Carrotstore_AppId, s_id_midi,s_json, Act_upload_midi_done, Act_updload_midi_fail);
     }
 
-    private void act_upload_midi(string s_data)
+    private void Act_upload_midi_done(string s_data)
     {
-        GetComponent<piano>().carrot.show_msg(PlayerPrefs.GetString("midi_public", "Publishing Midi"), PlayerPrefs.GetString("midi_public_success", "Thank you for contributing the draft midi piano, We will review and release to the world in the fastest time possible."), Carrot.Msg_Icon.Success);
+        p.carrot.show_msg(PlayerPrefs.GetString("midi_public", "Publishing Midi"), PlayerPrefs.GetString("midi_public_success", "Thank you for contributing the draft midi piano, We will review and release to the world in the fastest time possible."), Msg_Icon.Success);
         midi_item_temp.btn_upload.SetActive(false);
+    }
+
+    private void Act_updload_midi_fail(string s_error)
+    {
+        p.carrot.show_msg(PlayerPrefs.GetString("midi_public", "Publishing Midi"), s_error, Msg_Icon.Error);
     }
 
     public void show_list_download_midi()
     {
-        GetComponent<piano>().ShowInterstitialAd();
+        p.carrot.ads.show_ads_Interstitial();
         s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
-        WWWForm frm = GetComponent<piano>().carrot.frm_act("list_midi_online");
-        GetComponent<piano>().carrot.send(frm, act_get_list_midi_online);
+        StructuredQuery q = new(p.carrot.Carrotstore_AppId);
+        p.carrot.server.Get_doc(q.ToJson(), Act_get_list_midi_online_done);
     }
 
     public void show_list_buy_user_id(string s_user_id)
     {
-        WWWForm frm = GetComponent<piano>().carrot.frm_act("list_midi_online");
-        frm.AddField("user_id", s_user_id);
-        GetComponent<piano>().carrot.send(frm, act_get_list_midi_public_your);
+        s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
+        StructuredQuery q = new(p.carrot.Carrotstore_AppId);
+        q.Add_where("user_id", Query_OP.EQUAL, s_user_id);
+        p.carrot.server.Get_doc(q.ToJson(), Act_get_list_midi_online_done);
     }
 
-    private void act_get_list_midi_online(string s_data)
+    private void Act_get_list_midi_online_done(string s_data)
     {
-        IList list_midi = (IList)Carrot.Json.Deserialize(s_data);
+        IList list_midi = (IList)Json.Deserialize(s_data);
         if (list_midi.Count > 0)
         {
             this.box_list_midi = GetComponent<piano>().carrot.Create_Box(s_title_box, icon_list_online);
@@ -251,15 +263,13 @@ public class midi_list : MonoBehaviour
     public void get_midi_by_id(string s_midi_id)
     {
         if (this.box_list_midi != null) this.box_list_midi.close();
-        this.GetComponent<piano>().carrot.ads.Destroy_Banner_Ad();
-        WWWForm frm = GetComponent<piano>().carrot.frm_act("get_midi");
-        frm.AddField("id_midi", s_midi_id);
-        GetComponent<piano>().carrot.send(frm, act_get_midi);
+        p.carrot.ads.Destroy_Banner_Ad();
+        p.carrot.server.Get_doc_by_path(p.carrot.Carrotstore_AppId,s_midi_id, act_get_midi);
     }
 
     private void act_get_midi(string s_data)
     {
-        IDictionary data_midi = (IDictionary)Carrot.Json.Deserialize(s_data);
+        IDictionary data_midi = (IDictionary)Json.Deserialize(s_data);
         if (data_midi != null)
         {
             GameObject m_obj = Instantiate(item_midi_prefab);
@@ -279,8 +289,8 @@ public class midi_list : MonoBehaviour
     public void btn_show_list_category()
     {
         GetComponent<piano>().ShowInterstitialAd();
-        WWWForm frm_category = GetComponent<piano>().carrot.frm_act("category_midi");
-        GetComponent<piano>().carrot.send(frm_category, act_show_list_category);
+        StructuredQuery q = new("midi-category");
+        p.carrot.server.Get_doc(q.ToJson(), act_show_list_category);
     }
 
     private void act_show_list_category(string s_data)
@@ -310,9 +320,9 @@ public class midi_list : MonoBehaviour
     public void show_list_midi_by_category(string name_category)
     {
         s_title_box = name_category;
-        WWWForm frm = GetComponent<piano>().carrot.frm_act("list_midi_online");
-        frm.AddField("category", name_category);
-        GetComponent<piano>().carrot.send(frm, act_get_list_midi_online);
+        StructuredQuery q = new(p.carrot.Carrotstore_AppId);
+        q.Add_where("category", Query_OP.EQUAL, name_category);
+        p.carrot.server.Get_doc(q.ToJson(), this.Act_get_list_midi_online_done);
     }
 
 }

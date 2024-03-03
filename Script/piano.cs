@@ -527,12 +527,11 @@ public class piano : MonoBehaviour
 
     public void delete_midi_by_id(string id_midi)
     {
-        WWWForm frm_delete = carrot.frm_act("delete_midi");
-        frm_delete.AddField("id_midi", id_midi);
-        carrot.send(frm_delete, act_delete_midi);
+        this.carrot.show_loading();
+        this.carrot.server.Delete_Doc(carrot.Carrotstore_AppId, id_midi,Act_delete_midi);
     }
 
-    private void act_delete_midi(string s_data)
+    private void Act_delete_midi(string s_data)
     {
         carrot.show_msg(PlayerPrefs.GetString("list_midi_your_public", "Your published midi list"), PlayerPrefs.GetString("delete_success", "Deleted successfully!"));
         this.carrot.hide_loading();

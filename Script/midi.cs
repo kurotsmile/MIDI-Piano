@@ -407,7 +407,7 @@ public class midi : MonoBehaviour
         WWWForm frm_export = GameObject.Find("piano").GetComponent<piano>().carrot.frm_act("export_file_midi");
         frm_export.AddField("data_midi_index", "[" + Carrot.Json.Serialize(arr_note_index) + "]");
         frm_export.AddField("data_midi_type", "[" + Carrot.Json.Serialize(arr_note_type) + "]");
-        GameObject.Find("piano").GetComponent<piano>().carrot.send(frm_export, act_export_midi_file);
+       // GameObject.Find("piano").GetComponent<piano>().carrot.send(frm_export, act_export_midi_file);
     }
 
     private void act_export_midi_file(string s_data)

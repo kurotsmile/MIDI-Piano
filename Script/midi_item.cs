@@ -89,7 +89,7 @@ public class midi_item : MonoBehaviour
 
     public void upload()
     {
-        GameObject.Find("piano").GetComponent<midi_list>().upload_midi(this);
+        GameObject.Find("piano").GetComponent<midi_list>().Upload_midi(this);
     }
 
 
@@ -100,7 +100,7 @@ public class midi_item : MonoBehaviour
 
     public void share_link()
     {
-        string url_midi = GameObject.Find("piano").GetComponent<piano>().carrot.get_url_host() + "/piano/" + id_midi;
+        string url_midi = GameObject.Find("piano").GetComponent<piano>().carrot.mainhost + "/piano/" + id_midi;
         GameObject.Find("piano").GetComponent<piano>().carrot.show_share(url_midi, PlayerPrefs.GetString("share_your_midi_tip", "Share this work with everyone or your friends to enjoy"));
     }
 
