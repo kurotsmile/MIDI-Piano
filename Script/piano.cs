@@ -49,10 +49,7 @@ public class piano : MonoBehaviour
 
     private string link_deep_app;
     private bool is_open_list_after_login = false;
-#pragma warning disable 414
     private bool is_user_keyboar = true;
-#pragma warning restore 414
-
 
     private void Start()
     {
@@ -63,7 +60,7 @@ public class piano : MonoBehaviour
         carrot.act_after_close_all_box = set_use_keyboar_pc;
         carrot.shop.onCarrotPaySuccess += buy_carrot_pay_success;
         carrot.shop.onCarrotRestoreSuccess += restore_carrot_pay_success;
-        carrot.ads.set_act_Rewarded_Success(act_Rewarded_Success);
+        carrot.ads.set_act_Rewarded_Success(Act_Rewarded_Success);
         this.carrot.act_after_delete_all_data=this.delete_all_data;
 
         panel_menu_top.SetActive(true);
@@ -91,7 +88,7 @@ public class piano : MonoBehaviour
         if (PlayerPrefs.GetInt("is_show_effect", 0) == 0) is_show_effect = false; is_show_effect = true;
         act_show_hide_effect_click();
 
-        this.m_list.check_midi();
+        this.m_list.Check_midi();
         this.musical_instruments.Load_musical_instruments();
     }
 
@@ -245,8 +242,7 @@ public class piano : MonoBehaviour
 
     public void close_midi_editor()
     {
-        m.panel_midi_editor.GetComponent<midi>().close();
-        m.panel_midi_editor.SetActive(false);
+        m.close();
         panel_menu_top.SetActive(true);
         panel_menu_mini.SetActive(true);
         img_recod.color = Color.white;
@@ -461,8 +457,8 @@ public class piano : MonoBehaviour
     {
         if (s_id_product == carrot.shop.get_id_by_index(0))
         {
-            GameObject.Find("piano").GetComponent<piano>().carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("in_app_midi_success", "Thank you for your purchase, now you can use MIDI"));
-            GameObject.Find("piano").GetComponent<midi_list>().get_midi_by_id(id_midi_online_buy);
+            carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("in_app_midi_success", "Thank you for your purchase, now you can use MIDI"));
+            m_list.get_midi_by_id(id_midi_online_buy);
         }
 
         if (s_id_product == carrot.shop.get_id_by_index(2))
@@ -571,7 +567,7 @@ public class piano : MonoBehaviour
     }
 
     [ContextMenu("Test Rewarded Ads Success")]
-    private void act_Rewarded_Success()
+    private void Act_Rewarded_Success()
     {
         this.musical_instruments.on_success_rewarded_musical_instruments();
     }

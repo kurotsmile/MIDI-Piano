@@ -327,8 +327,8 @@ public class midi : MonoBehaviour
 
     public void save_midi()
     {
-        List<int[]> data_index_piano_save = new List<int[]>();
-        List<int[]> data_type_piano_save = new List<int[]>();
+        List<int[]> data_index_piano_save = new();
+        List<int[]> data_type_piano_save = new();
         for (int i = 0; i < list_midi_line.Count; i++)
         {
             data_index_piano_save.Add(list_midi_line[i].get_arr_int_index_note_piano());
@@ -339,9 +339,9 @@ public class midi : MonoBehaviour
         string s_data_type = Carrot.Json.Serialize(data_type_piano_save);
 
         if (index_midi_edit == -1)
-            GameObject.Find("piano").GetComponent<midi_list>().add_item_midi(inp_name_midi.text, s_data_index, s_data_type, speed, type_edit_midi);
+            p.m_list.add_item_midi(inp_name_midi.text, s_data_index, s_data_type, speed, type_edit_midi);
         else
-            GameObject.Find("piano").GetComponent<midi_list>().upadte_item_midi(index_midi_edit, inp_name_midi.text, s_data_index, s_data_type, speed);
+            p.m_list.upadte_item_midi(index_midi_edit, inp_name_midi.text, s_data_index, s_data_type, speed);
     }
 
 
@@ -396,6 +396,7 @@ public class midi : MonoBehaviour
     public void close()
     {
         this.panel_midi_editor.SetActive(false);
+        this.p.panel_menu_top.SetActive(true);
         p.carrot.play_sound_click();
         p.rest_color_all_note();
         img_play_midi.sprite = icon_play;

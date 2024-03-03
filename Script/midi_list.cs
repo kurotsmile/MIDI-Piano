@@ -18,7 +18,7 @@ public class midi_list : MonoBehaviour
 
     private string s_title_box;
 
-    public void check_midi()
+    public void Check_midi()
     {
         leng_midi = PlayerPrefs.GetInt("leng_m");
     }
@@ -31,10 +31,10 @@ public class midi_list : MonoBehaviour
         PlayerPrefs.SetString("m_" + leng_midi + "_data_type", _data_type);
         PlayerPrefs.SetFloat("m_" + leng_midi + "_speed", speed);
         PlayerPrefs.SetInt("m_" + leng_midi + "_type", type);
-        leng_midi = leng_midi + 1;
+        leng_midi++;
         PlayerPrefs.SetInt("leng_m", leng_midi);
-        GetComponent<piano>().close_midi_editor();
-        check_midi();
+        p.close_midi_editor();
+        Check_midi();
         show_list();
     }
 
@@ -45,17 +45,17 @@ public class midi_list : MonoBehaviour
         PlayerPrefs.SetString("m_" + index_update + "_data_index", _data_index);
         PlayerPrefs.SetString("m_" + index_update + "_data_type", _data_type);
         PlayerPrefs.SetFloat("m_" + index_update + "_speed", speed);
-        GetComponent<piano>().close_midi_editor();
-        check_midi();
+        p.close_midi_editor();
+        Check_midi();
         show_list();
     }
 
     public void show_list()
     {
-        this.GetComponent<piano>().carrot.play_sound_click();
+        p.carrot.play_sound_click();
         if (leng_midi > 0)
         {
-            this.box_list_midi=GetComponent<piano>().carrot.Create_Box(PlayerPrefs.GetString("list_midi_your", "Your Midi list"), icon);
+            this.box_list_midi=p.carrot.Create_Box(PlayerPrefs.GetString("list_midi_your", "Your Midi list"), icon);
             bool is_list_true = false;
             for (int i = 0; i < leng_midi; i++)
             {
@@ -71,7 +71,7 @@ public class midi_list : MonoBehaviour
                     i_midi.GetComponent<midi_item>().check_type();
                     i_midi.GetComponent<midi_item>().btn_view.SetActive(false);
                     i_midi.GetComponent<midi_item>().btn_share.SetActive(false);
-                    if (GetComponent<piano>().carrot.is_online())
+                    if (p.carrot.is_online())
                         i_midi.GetComponent<midi_item>().btn_upload.SetActive(true);
                     else
                         i_midi.GetComponent<midi_item>().btn_upload.SetActive(false);
@@ -82,18 +82,18 @@ public class midi_list : MonoBehaviour
                     is_list_true = true;
                 }
             }
-            if (!is_list_true) GetComponent<piano>().carrot.show_msg(PlayerPrefs.GetString("list_midi_your", "Your Midi list"), PlayerPrefs.GetString("none_midi_save", "No midi compositions are archived yet"), Carrot.Msg_Icon.Alert);
+            if (!is_list_true) p.carrot.show_msg(PlayerPrefs.GetString("list_midi_your", "Your Midi list"), PlayerPrefs.GetString("none_midi_save", "No midi compositions are archived yet"), Carrot.Msg_Icon.Alert);
         }
         else
         {
             if (this.box_list_midi != null) this.box_list_midi.close();
-            GetComponent<piano>().carrot.show_msg(PlayerPrefs.GetString("list_midi_your", "Your Midi list"), PlayerPrefs.GetString("none_midi_save", "No midi compositions are archived yet"), Carrot.Msg_Icon.Alert);
+            p.carrot.show_msg(PlayerPrefs.GetString("list_midi_your", "Your Midi list"), PlayerPrefs.GetString("none_midi_save", "No midi compositions are archived yet"), Carrot.Msg_Icon.Alert);
         }
     }
 
     public void func_search()
     {
-        GetComponent<piano>().set_no_use_keyboar_pc();
+        p.set_no_use_keyboar_pc();
         p.carrot.show_search( Act_done_search, PlayerPrefs.GetString("search_midi_tip", "You can Search for midi songs online, for reference and use for composition purposes"));
     }
 
@@ -113,7 +113,7 @@ public class midi_list : MonoBehaviour
         PlayerPrefs.DeleteKey("m_" + index + "_speed");
         PlayerPrefs.DeleteKey("m_" + index + "_type");
         check_after_delete();
-        check_midi();
+        Check_midi();
         show_list();
     }
 
@@ -181,13 +181,13 @@ public class midi_list : MonoBehaviour
 
     private void Act_get_list_midi_online_done(string s_data)
     {
-        IList list_midi = (IList)Json.Deserialize(s_data);
-        if (list_midi.Count > 0)
+        Fire_Collection fc = new(s_data);
+        if (!fc.is_null)
         {
-            this.box_list_midi = GetComponent<piano>().carrot.Create_Box(s_title_box, icon_list_online);
-            for (int i = 0; i < list_midi.Count; i++)
+            this.box_list_midi = p.carrot.Create_Box(s_title_box, icon_list_online);
+            for (int i = 0; i < fc.fire_document.Length; i++)
             {
-                IDictionary m_dimi = (IDictionary)list_midi[i];
+                IDictionary m_dimi = fc.fire_document[i].Get_IDictionary();
                 GameObject i_midi = Instantiate(item_midi_prefab);
                 i_midi.GetComponent<midi_item>().id_midi = m_dimi["id_midi"].ToString();
                 i_midi.GetComponent<midi_item>().index = -1;
@@ -218,13 +218,13 @@ public class midi_list : MonoBehaviour
                 i_midi.transform.SetParent(this.box_list_midi.area_all_item);
                 i_midi.transform.localScale = new Vector3(1f, 1f, 0f);
             }
-            Carrot.Carrot_Box_Btn_Item btn_search= this.box_list_midi.create_btn_menu_header(this.GetComponent<piano>().carrot.icon_carrot_search);
+            Carrot.Carrot_Box_Btn_Item btn_search= this.box_list_midi.create_btn_menu_header(p.carrot.icon_carrot_search);
             btn_search.set_act(func_search);
             this.box_list_midi.update_color_table_row();
         }
         else
         {
-            GetComponent<piano>().carrot.show_msg(PlayerPrefs.GetString("list_midi_online", "List Midi Online"), PlayerPrefs.GetString("none_midi_search", "No related midi compositions found"), Carrot.Msg_Icon.Alert);
+            p.carrot.show_msg(PlayerPrefs.GetString("list_midi_online", "List Midi Online"), PlayerPrefs.GetString("none_midi_search", "No related midi compositions found"), Carrot.Msg_Icon.Alert);
         }
     }
 
@@ -233,7 +233,7 @@ public class midi_list : MonoBehaviour
         IList list_midi = (IList)Carrot.Json.Deserialize(s_data);
         if (list_midi.Count > 0)
         {
-            Carrot.Carrot_Box box_midi_public_your=this.GetComponent<piano>().carrot.Create_Box(PlayerPrefs.GetString("list_midi_your_public", "Your published midi list"), icon_list_online);
+            Carrot.Carrot_Box box_midi_public_your=p.carrot.Create_Box(PlayerPrefs.GetString("list_midi_your_public", "Your published midi list"), icon_list_online);
             for (int i = 0; i < list_midi.Count; i++)
             {
                 IDictionary m_dimi = (IDictionary)list_midi[i];
@@ -256,7 +256,7 @@ public class midi_list : MonoBehaviour
         }
         else
         {
-            GetComponent<piano>().carrot.show_msg(PlayerPrefs.GetString("list_midi_your_public", "Your published midi list"), PlayerPrefs.GetString("none_midi_public", "You don't have any published midi compositions yet !"), Carrot.Msg_Icon.Alert);
+            p.carrot.show_msg(PlayerPrefs.GetString("list_midi_your_public", "Your published midi list"), PlayerPrefs.GetString("none_midi_public", "You don't have any published midi compositions yet !"), Carrot.Msg_Icon.Alert);
         }
     }
 
@@ -280,7 +280,7 @@ public class midi_list : MonoBehaviour
             m.s_data_type = data_midi["data_type"].ToString();
             m.speed = float.Parse(data_midi["speed"].ToString());
             m.type_edit = 1;
-            GameObject.Find("piano").GetComponent<piano>().load_midi(m);
+            p.load_midi(m);
             Destroy(m_obj);
         }
 
@@ -288,7 +288,7 @@ public class midi_list : MonoBehaviour
 
     public void btn_show_list_category()
     {
-        GetComponent<piano>().ShowInterstitialAd();
+        p.ShowInterstitialAd();
         StructuredQuery q = new("midi-category");
         p.carrot.server.Get_doc(q.ToJson(), act_show_list_category);
     }
@@ -296,7 +296,7 @@ public class midi_list : MonoBehaviour
     private void act_show_list_category(string s_data)
     {
         IList list_cat = (IList)Carrot.Json.Deserialize(s_data);
-        Carrot.Carrot_Box box_list_category=this.GetComponent<piano>().carrot.Create_Box(PlayerPrefs.GetString("midi_category", "List of midi genres"), icon_list_category);
+        Carrot.Carrot_Box box_list_category=p.carrot.Create_Box(PlayerPrefs.GetString("midi_category", "List of midi genres"), icon_list_category);
         for (int i = 0; i < list_cat.Count; i++)
         {
             IDictionary m_cat = (IDictionary)list_cat[i];
