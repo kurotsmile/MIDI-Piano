@@ -5,10 +5,15 @@ using UnityEngine.UI;
 
 public class midi : MonoBehaviour
 {
+    [Header("Obj Main")]
+    public piano p;
+
+    [Header("Obj Midi")]
+    public GameObject panel_midi_editor;
     private bool is_play = false;
     private int sel_index_line = 0;
     private int length_midi_note = 0;
-    private List<midi_line> list_midi_line = new List<midi_line>();
+    private List<midi_line> list_midi_line = new();
     public GameObject midi_line_prefab;
 
     private float count_next_midi_timer = 0f;
@@ -40,6 +45,12 @@ public class midi : MonoBehaviour
     public Slider slider_speed;
 
     private int type_edit_midi = 0;
+
+    public void Show_editor()
+    {
+        this.load_midi();
+    }
+
     public void load_midi()
     {
         panel_menu_act.SetActive(true);
@@ -61,7 +72,7 @@ public class midi : MonoBehaviour
 
     private void clear_all_line()
     {
-        GameObject.Find("piano").GetComponent<piano>().carrot.clear_contain(area_all_line);
+        p.carrot.clear_contain(area_all_line);
         list_midi_line = new List<midi_line>();
         sel_index_line = 0;
         length_midi_note = 0;
@@ -153,7 +164,7 @@ public class midi : MonoBehaviour
         {
             int index_p = int.Parse(arr_index[i].ToString());
             int type_p = int.Parse(arr_type[i].ToString());
-            string s_txt_piano = GameObject.Find("piano").GetComponent<piano>().get_txt_note_piano(index_p, type_p);
+            string s_txt_piano = p.get_txt_note_piano(index_p, type_p);
             item_midi_line.GetComponent<midi_line>().add_note_midi(s_txt_piano, index_p, type_p);
         }
         list_midi_line.Add(item_midi_line.GetComponent<midi_line>());
@@ -193,7 +204,7 @@ public class midi : MonoBehaviour
                 m_note.play(midi_color_play);
             }
         }
-        GameObject.Find("piano").GetComponent<piano>().play_note_midi(arr_index_note, arr_type_note);
+        p.play_note_midi(arr_index_note, arr_type_note);
     }
 
     public void play_midi()
@@ -336,9 +347,10 @@ public class midi : MonoBehaviour
 
     public void open_midi(midi_item item_midi)
     {
-        GameObject.Find("piano").GetComponent<piano>().carrot.play_sound_click();
-        GameObject.Find("piano").GetComponent<piano>().panel_menu_top.SetActive(false);
-        GameObject.Find("piano").GetComponent<piano>().panel_menu_mini.SetActive(false);
+        this.panel_midi_editor.SetActive(true);
+        p.carrot.play_sound_click();
+        p.panel_menu_top.SetActive(false);
+        p.panel_menu_mini.SetActive(false);
         gameObject.SetActive(true);
         panel_midi_speed.SetActive(false);
         speed = item_midi.speed;
@@ -369,7 +381,7 @@ public class midi : MonoBehaviour
 
     public void show_speed_setting()
     {
-        GameObject.Find("piano").GetComponent<piano>().carrot.play_sound_click();
+        p.carrot.play_sound_click();
         slider_speed.value = speed;
         panel_midi_speed.SetActive(true);
     }
@@ -383,8 +395,9 @@ public class midi : MonoBehaviour
 
     public void close()
     {
-        GameObject.Find("piano").GetComponent<piano>().carrot.play_sound_click();
-        GameObject.Find("piano").GetComponent<piano>().rest_color_all_note();
+        this.panel_midi_editor.SetActive(false);
+        p.carrot.play_sound_click();
+        p.rest_color_all_note();
         img_play_midi.sprite = icon_play;
         is_play = false;
     }
@@ -404,15 +417,15 @@ public class midi : MonoBehaviour
         Debug.Log(Carrot.Json.Serialize(arr_note_index));
         Debug.Log(Carrot.Json.Serialize(arr_note_type));
 
-        WWWForm frm_export = GameObject.Find("piano").GetComponent<piano>().carrot.frm_act("export_file_midi");
+        WWWForm frm_export = p.carrot.frm_act("export_file_midi");
         frm_export.AddField("data_midi_index", "[" + Carrot.Json.Serialize(arr_note_index) + "]");
         frm_export.AddField("data_midi_type", "[" + Carrot.Json.Serialize(arr_note_type) + "]");
-       // GameObject.Find("piano").GetComponent<piano>().carrot.send(frm_export, act_export_midi_file);
+       // p.carrot.send(frm_export, act_export_midi_file);
     }
 
     private void act_export_midi_file(string s_data)
     {
-        GameObject.Find("piano").GetComponent<piano>().carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!"), Carrot.Msg_Icon.Success);
+        p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!"), Carrot.Msg_Icon.Success);
         Application.OpenURL(s_data);
     }
 }

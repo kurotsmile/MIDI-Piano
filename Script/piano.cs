@@ -5,7 +5,13 @@ using UnityEngine.UI;
 
 public class piano : MonoBehaviour
 {
+    [Header("Obj Main")]
     public Carrot.Carrot carrot;
+    public midi m;
+    public midi_list m_list;
+    public musical_instruments_manager musical_instruments;
+
+    [Header("Obj Other")]
     private int sel_show_text_type = 0;
     private bool is_lock_key = false;
     private bool is_show_effect = true;
@@ -32,7 +38,6 @@ public class piano : MonoBehaviour
     public Image img_text_key;
     public Image img_recod;
     public Image img_effect;
-    public GameObject panel_midi_editor;
     public Text txt_show_name_note;
     public GameObject effect_play;
     public metronome metro;
@@ -63,7 +68,7 @@ public class piano : MonoBehaviour
 
         panel_menu_top.SetActive(true);
         panel_menu_mini.SetActive(true);
-        panel_midi_editor.SetActive(false);
+        m.panel_midi_editor.SetActive(false);
         metro.panel_metronome.SetActive(false);
 
         for (int i = 0; i < note_white.Length; i++)
@@ -85,8 +90,9 @@ public class piano : MonoBehaviour
         act_unclock_or_lock_scroll_piano();
         if (PlayerPrefs.GetInt("is_show_effect", 0) == 0) is_show_effect = false; is_show_effect = true;
         act_show_hide_effect_click();
-        GetComponent<midi_list>().check_midi();
-        this.GetComponent<musical_instruments_manager>().Load_musical_instruments();
+
+        this.m_list.check_midi();
+        this.musical_instruments.Load_musical_instruments();
     }
 
     public void check_link_deep_app()
@@ -117,7 +123,7 @@ public class piano : MonoBehaviour
 
     private void check_exit_app()
     {
-        if (panel_midi_editor.activeInHierarchy)
+        if (m.panel_midi_editor.activeInHierarchy)
         {
             close_midi_editor();
             carrot.set_no_check_exit_app();
@@ -231,7 +237,7 @@ public class piano : MonoBehaviour
     {
         this.carrot.ads.show_ads_Interstitial();
         this.carrot.play_sound_click();
-        if (panel_midi_editor.activeInHierarchy)
+        if (m.panel_midi_editor.activeInHierarchy)
             close_midi_editor();
         else
             show_midi_editor();
@@ -239,8 +245,8 @@ public class piano : MonoBehaviour
 
     public void close_midi_editor()
     {
-        panel_midi_editor.GetComponent<midi>().close();
-        panel_midi_editor.SetActive(false);
+        m.panel_midi_editor.GetComponent<midi>().close();
+        m.panel_midi_editor.SetActive(false);
         panel_menu_top.SetActive(true);
         panel_menu_mini.SetActive(true);
         img_recod.color = Color.white;
@@ -251,9 +257,9 @@ public class piano : MonoBehaviour
 
     private void show_midi_editor()
     {
-        panel_midi_editor.SetActive(true);
+        m.panel_midi_editor.SetActive(true);
         panel_menu_top.SetActive(false);
-        panel_midi_editor.GetComponent<midi>().load_midi();
+        m.Show_editor();
         img_recod.color = Color.red;
         panel_menu_mini.SetActive(false);
         this.carrot.ads.Destroy_Banner_Ad();
@@ -267,7 +273,7 @@ public class piano : MonoBehaviour
         else
             txt_show_name_note.text = note_black[index].s_piano.Replace("\n", "");
 
-        if (panel_midi_editor.activeInHierarchy) panel_midi_editor.GetComponent<midi>().recod_note_midi(txt_show_name_note.text, index, type_note);
+        if (m.panel_midi_editor.activeInHierarchy) m.recod_note_midi(txt_show_name_note.text, index, type_note);
 
         if (!is_lock_key && !is_pos_mouse)
         {
@@ -347,7 +353,7 @@ public class piano : MonoBehaviour
 
     public void load_midi(midi_item item_midi)
     {
-        panel_midi_editor.GetComponent<midi>().open_midi(item_midi);
+        m.open_midi(item_midi);
         carrot.close();
     }
 
@@ -390,11 +396,11 @@ public class piano : MonoBehaviour
         Carrot.Carrot_Box box_setting=this.carrot.Create_Setting();
 
         Carrot.Carrot_Box_Item setting_instruments = box_setting.create_item_of_top("list_midi");
-        setting_instruments.set_icon(this.GetComponent<musical_instruments_manager>().img_musical_instruments.sprite);
+        setting_instruments.set_icon(this.musical_instruments.img_musical_instruments.sprite);
         setting_instruments.set_title(PlayerPrefs.GetString("musical_instruments", "Musical Instruments"));
-        setting_instruments.set_tip(this.GetComponent<musical_instruments_manager>().get_name_instruments());
+        setting_instruments.set_tip(this.musical_instruments.get_name_instruments());
         setting_instruments.set_key_lang_title("musical_instruments");
-        setting_instruments.set_act(() => this.GetComponent<musical_instruments_manager>().show_list_musical_instruments());
+        setting_instruments.set_act(() => this.musical_instruments.show_list_musical_instruments());
 
         if (PlayerPrefs.GetInt("buy_list", 0) == 0)
         {
@@ -560,14 +566,14 @@ public class piano : MonoBehaviour
 
     public void buy_musical_instruments(int index_tool)
     {
-        this.GetComponent<musical_instruments_manager>().set_index_buy_musical_instruments(index_tool);
+        this.musical_instruments.set_index_buy_musical_instruments(index_tool);
         this.carrot.buy_product(3);
     }
 
     [ContextMenu("Test Rewarded Ads Success")]
     private void act_Rewarded_Success()
     {
-        this.GetComponent<musical_instruments_manager>().on_success_rewarded_musical_instruments();
+        this.musical_instruments.on_success_rewarded_musical_instruments();
     }
 
 }
