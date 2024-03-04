@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -446,15 +447,66 @@ public class midi : MonoBehaviour
         Debug.Log(Carrot.Json.Serialize(arr_note_index));
         Debug.Log(Carrot.Json.Serialize(arr_note_type));
 
-        WWWForm frm_export = p.carrot.frm_act("export_file_midi");
-        frm_export.AddField("data_midi_index", "[" + Carrot.Json.Serialize(arr_note_index) + "]");
-        frm_export.AddField("data_midi_type", "[" + Carrot.Json.Serialize(arr_note_type) + "]");
-       // p.carrot.send(frm_export, act_export_midi_file);
+        List<MidiEvent> midiEvents = new List<MidiEvent>();
+        midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 0, 0, 60, 100));
+        midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 1, 0, 60, 100));
+        midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 2, 0, 60, 100));
+        WriteMidiFile(Application.persistentDataPath+"/example.mid", midiEvents);
     }
 
     private void act_export_midi_file(string s_data)
     {
         p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!"), Carrot.Msg_Icon.Success);
         Application.OpenURL(s_data);
+    }
+
+    void WriteMidiFile(string fileName, List<MidiEvent> events)
+    {
+        using (FileStream stream = new FileStream(fileName, FileMode.Create))
+        {
+            BinaryWriter writer = new BinaryWriter(stream);
+
+            writer.Write(new char[] { 'M', 'T', 'h', 'd' });
+            writer.Write(6);
+            writer.Write((short)0);
+            writer.Write((short)1);
+            writer.Write((short)480);
+
+            foreach (var midiEvent in events)
+            {
+                writer.Write((byte)midiEvent.type); 
+                writer.Write((byte)midiEvent.channel); 
+                writer.Write((byte)midiEvent.note);
+                writer.Write((byte)midiEvent.velocity);
+                writer.Write((int)midiEvent.deltaTime);
+            }
+
+            writer.Close();
+            Debug.Log("MIDI file written: " + fileName);
+        }
+    }
+
+    public class MidiEvent
+    {
+        public MidiEventType type;
+        public int deltaTime;
+        public int channel;
+        public int note;
+        public int velocity;
+
+        public MidiEvent(MidiEventType type, int deltaTime, int channel, int note, int velocity)
+        {
+            this.type = type;
+            this.deltaTime = deltaTime;
+            this.channel = channel;
+            this.note = note;
+            this.velocity = velocity;
+        }
+    }
+
+    public enum MidiEventType
+    {
+        NoteOn = 0x90,
+        NoteOff = 0x80
     }
 }
