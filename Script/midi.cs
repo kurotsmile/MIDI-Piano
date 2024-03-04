@@ -447,17 +447,12 @@ public class midi : MonoBehaviour
         Debug.Log(Carrot.Json.Serialize(arr_note_index));
         Debug.Log(Carrot.Json.Serialize(arr_note_type));
 
-        List<MidiEvent> midiEvents = new List<MidiEvent>();
+        List<MidiEvent> midiEvents = new();
         midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 0, 0, 60, 100));
         midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 1, 0, 60, 100));
         midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 2, 0, 60, 100));
         WriteMidiFile(Application.persistentDataPath+"/example.mid", midiEvents);
-    }
-
-    private void act_export_midi_file(string s_data)
-    {
         p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!"), Carrot.Msg_Icon.Success);
-        Application.OpenURL(s_data);
     }
 
     void WriteMidiFile(string fileName, List<MidiEvent> events)
