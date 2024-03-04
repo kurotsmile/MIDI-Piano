@@ -49,6 +49,8 @@ public class midi : MonoBehaviour
     public Text txt_timer_speed_setting;
     public Slider slider_speed;
 
+    private Carrot_Window_Input box_inp;
+
     public void Show_editor()
     {
         p.carrot.play_sound_click();
@@ -428,8 +430,14 @@ public class midi : MonoBehaviour
         p.carrot.ads.create_banner_ads();
     }
 
-    public void btn_export_midi()
+    public void Btn_export_midi()
     {
+        this.Export_midi_cur_editor();
+    }
+
+    private void Export_midi_cur_editor()
+    {
+        IDictionary data = (IDictionary) Json.Deserialize("{}");
         int length_midi = list_midi_line[0].get_midi_note_length();
         int[] arr_note_index = new int[length_midi];
         int[] arr_note_type = new int[length_midi];
@@ -439,7 +447,13 @@ public class midi : MonoBehaviour
             arr_note_index[i] = list_midi_line[0].get_midi_note(i).index_note_piano;
             arr_note_type[i] = list_midi_line[0].get_midi_note(i).type_note_piano;
         }
+        if (inp_name_midi.text.Trim() == "") inp_name_midi.text = "Midi"+this.p.carrot.generateID();
+        data["name"] = inp_name_midi.text;
+        this.Export_midi_by_data(data);
+    }
 
+    public void Export_midi_by_data(IDictionary data)
+    {
         List<MidiEvent> midiEvents = new()
         {
             new MidiEvent(MidiEventType.NoteOn, 0, 0, 60, 100),
@@ -449,9 +463,9 @@ public class midi : MonoBehaviour
 
         if (Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite))
         {
-            string fullPath = Path.Combine(Application.persistentDataPath, inp_name_midi.text+".mid");
+            string fullPath = Path.Combine(Application.persistentDataPath, data["name"].ToString() + ".mid");
             WriteMidiFile(fullPath, midiEvents);
-            p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!")+" "+fullPath, Carrot.Msg_Icon.Success);
+            p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!") + "\n" + fullPath, Carrot.Msg_Icon.Success);
         }
         else
         {
@@ -461,28 +475,26 @@ public class midi : MonoBehaviour
 
     void WriteMidiFile(string fileName, List<MidiEvent> events)
     {
-        using (FileStream stream = new(fileName, FileMode.Create))
+        using FileStream stream = new(fileName, FileMode.Create);
+        BinaryWriter writer = new(stream);
+
+        writer.Write(new char[] { 'M', 'T', 'h', 'd' });
+        writer.Write(6);
+        writer.Write((short)0);
+        writer.Write((short)1);
+        writer.Write((short)480);
+
+        foreach (var midiEvent in events)
         {
-            BinaryWriter writer = new(stream);
-
-            writer.Write(new char[] { 'M', 'T', 'h', 'd' });
-            writer.Write(6);
-            writer.Write((short)0);
-            writer.Write((short)1);
-            writer.Write((short)480);
-
-            foreach (var midiEvent in events)
-            {
-                writer.Write((byte)midiEvent.type); 
-                writer.Write((byte)midiEvent.channel); 
-                writer.Write((byte)midiEvent.note);
-                writer.Write((byte)midiEvent.velocity);
-                writer.Write((int)midiEvent.deltaTime);
-            }
-
-            writer.Close();
-            Debug.Log("MIDI file written: " + fileName);
+            writer.Write((byte)midiEvent.type);
+            writer.Write((byte)midiEvent.channel);
+            writer.Write((byte)midiEvent.note);
+            writer.Write((byte)midiEvent.velocity);
+            writer.Write((int)midiEvent.deltaTime);
         }
+
+        writer.Close();
+        Debug.Log("MIDI file written: " + fileName);
     }
 
     public class MidiEvent
@@ -507,5 +519,111 @@ public class midi : MonoBehaviour
     {
         NoteOn = 0x90,
         NoteOff = 0x80
+    }
+
+    public void Btn_import_by_text()
+    {
+        p.set_no_use_keyboar_pc();
+        box_inp=this.p.carrot.show_input("Import Midi By Text Code", "Enter code","");
+        box_inp.set_act_done(this.Act_import_midi_code);
+    }
+
+    private void Act_import_midi_code(string s_data)
+    {
+        s_data = s_data.Replace("\n", " ");
+        if (box_inp != null) box_inp.close();
+        p.carrot.show_msg(s_data);
+        string[] arr_key=s_data.Split(" ");
+
+        foreach(string s in arr_key)
+        {
+            if (s.IndexOf("[") > -1)
+            {
+                add_col_midi();
+                var s_note_midi_group = s.Substring(s.IndexOf("[") + 1, s.IndexOf("]"));
+                Add_col_midi_buy_group_midi_note(s_note_midi_group);
+            }
+            else
+            {
+                Get_note_by_key_code(s);
+            }
+            add_col_midi();
+        }
+    }
+
+    private void Add_col_midi_buy_group_midi_note(string s_note_group)
+    {
+        if (s_note_group.Length > this.list_midi_line.Count)
+        {
+            for (var i = this.list_midi_line.Count; i < s_note_group.Length; i++)
+            {
+                add_line_midi();
+            }
+        }
+
+        for (var i = 0; i <this.list_midi_line.Count; i++)
+        {
+            IDictionary data_n = this.Get_note_data_by_key(s_note_group[i].ToString());
+            if (data_n != null)
+            {
+                midi_note n = get_midi_note_by_point(this.length_midi_note - 1, i);
+                n.type_note_piano = int.Parse(data_n["type"].ToString());
+                n.index_note_piano = int.Parse(data_n["index"].ToString());
+                n.txt.text = data_n["key"].ToString();
+            }
+        }
+    }
+
+    private midi_note get_midi_note_by_point(int col,int row)
+    {
+        return this.list_midi_line[row].get_midi_note(col);
+    }
+
+    private void Get_note_by_key_code(string s_key)
+    {
+        foreach(piano_note n in p.note_white)
+        {
+            if (n.s_pc == s_key)
+            {
+                recod_note_midi(n.s_pc, n.index, n.type);
+            }
+        }
+
+        foreach (piano_note n in p.note_black)
+        {
+            if (n.s_pc == s_key)
+            {
+                recod_note_midi(n.s_pc, n.index, n.type);
+            }
+        }
+    }
+
+    private IDictionary Get_note_data_by_key(string s_key)
+    {
+        IDictionary data = (IDictionary)Json.Deserialize("{}");
+        foreach (piano_note n in p.note_white)
+        {
+            if (n.s_pc == s_key)
+            {
+                data["key"] = n.s_pc;
+                data["index"] = n.index;
+                data["type"] = n.type;
+            }
+        }
+
+        foreach (piano_note n in p.note_black)
+        {
+            if (n.s_pc == s_key)
+            {
+                data["key"] = n.s_pc;
+                data["index"] = n.index;
+                data["type"] = n.type;
+            }
+        }
+
+        if (data["key"] != null)
+            return data;
+        else
+            return null;
     }
 }

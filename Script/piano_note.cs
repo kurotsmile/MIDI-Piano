@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class piano_note : MonoBehaviour
@@ -11,16 +12,32 @@ public class piano_note : MonoBehaviour
     public string s_pc;
     public string s_code_shift_pc;
     public float pos_scroll;
+
+    private UnityAction act_click;
+    private UnityAction act_click_key;
+
+    public void Set_Act_Click(UnityAction act)
+    {
+        this.act_click = act;
+    }
+
+    public void Set_Act_Click_Key(UnityAction act)
+    {
+        this.act_click_key = act;
+    }
+
     public void click()
     {
         sound_piano.Play();
-        GameObject.Find("piano").GetComponent<piano>().play_note(index, type, true);
+        act_click?.Invoke();
+        //GameObject.Find("piano").GetComponent<piano>().play_note(index, type, true);
     }
 
     public void click_key()
     {
         sound_piano.Play();
-        GameObject.Find("piano").GetComponent<piano>().play_note(index, type, false);
+        act_click_key?.Invoke();
+        //GameObject.Find("piano").GetComponent<piano>().play_note(index, type, false);
     }
 
     public void play()

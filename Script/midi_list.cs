@@ -14,6 +14,7 @@ public class midi_list : MonoBehaviour
     public Sprite icon_list_category;
     public Sprite icon_midi_buy;
     public Sprite icon_upload;
+    public Sprite icon_export;
     private int leng_midi = 0;
     private Carrot_Box box_list_midi;
 
@@ -108,6 +109,11 @@ public class midi_list : MonoBehaviour
             btn_download.set_color(p.carrot.color_highlight);
             btn_download.set_act(() => Download_midi(data));
         }
+
+        Carrot_Box_Btn_Item btn_export = item_m.create_item();
+        btn_export.set_icon(icon_export);
+        btn_export.set_color(p.carrot.color_highlight);
+        btn_export.set_act(() => p.m.Export_midi_by_data(data));
 
         if (p.carrot.model_app == ModelApp.Develope)
         {

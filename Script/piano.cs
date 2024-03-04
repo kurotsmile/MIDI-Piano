@@ -69,14 +69,20 @@ public class piano : MonoBehaviour
 
         for (int i = 0; i < note_white.Length; i++)
         {
+            var index = i;
             note_white[i].index = i;
             note_white[i].type = 0;
+            note_white[i].Set_Act_Click(()=>this.play_note(index, 0, true));
+            note_white[i].Set_Act_Click_Key(()=>this.play_note(index, 0, false));
         }
 
         for (int i = 0; i < note_black.Length; i++)
         {
+            var index = i;
             note_black[i].index = i;
             note_black[i].type = 1;
+            note_black[i].Set_Act_Click(() => this.play_note(index, 1, true));
+            note_black[i].Set_Act_Click_Key(() => this.play_note(index,1, false));
         }
 
         sel_show_text_type = PlayerPrefs.GetInt("sel_show_text_type", 1);
