@@ -313,12 +313,6 @@ public class piano : MonoBehaviour
         PlayerPrefs.SetFloat("pos_scroll_piano", rec_view_piano.horizontalNormalizedPosition);
     }
 
-    public void load_midi(midi_item item_midi)
-    {
-        m.open_midi(item_midi);
-        carrot.close();
-    }
-
     public string get_txt_note_piano(int index_note, int type_note)
     {
         if (index_note != -1)

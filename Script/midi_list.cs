@@ -140,7 +140,7 @@ public class midi_list : MonoBehaviour
         data_midi["speed"] = m_item.speed.ToString();
         data_midi["data_type"] = m_item.s_data_type;
         data_midi["data_index"] = m_item.s_data_index;
-        data_midi["name_midi"] = m_item.txt_name.text;
+        data_midi["name"] = m_item.txt_name.text;
         
         if (s_id_user != "")
         {
@@ -187,76 +187,20 @@ public class midi_list : MonoBehaviour
             this.box_list_midi = p.carrot.Create_Box(s_title_box, icon_list_online);
             for (int i = 0; i < fc.fire_document.Length; i++)
             {
-                IDictionary m_dimi = fc.fire_document[i].Get_IDictionary();
-                GameObject i_midi = Instantiate(item_midi_prefab);
-                i_midi.GetComponent<midi_item>().id_midi = m_dimi["id_midi"].ToString();
-                i_midi.GetComponent<midi_item>().index = -1;
-                i_midi.GetComponent<midi_item>().txt_name.text = m_dimi["name"].ToString();
-                i_midi.GetComponent<midi_item>().name_midi = m_dimi["name"].ToString();
-                i_midi.GetComponent<midi_item>().link = m_dimi["link"].ToString();
-                i_midi.GetComponent<midi_item>().speed = float.Parse(m_dimi["speed"].ToString());
-                i_midi.GetComponent<midi_item>().type_edit = 1;
-                if (m_dimi["sell"].ToString() == "1")
-                {
-                    i_midi.GetComponent<midi_item>().sell = 1;
-                    i_midi.GetComponent<midi_item>().btn_buy.sprite = icon_list_online;
-                }
-                else
-                {
-                    if (PlayerPrefs.GetInt("buy_list", 0) == 0)
-                    {
-                        i_midi.GetComponent<midi_item>().sell = 2;
-                    }
-                    else
-                    {
-                        i_midi.GetComponent<midi_item>().sell = 1;
-                    }
-                    i_midi.GetComponent<midi_item>().btn_buy.sprite = icon_midi_buy;
-                }
-                i_midi.GetComponent<midi_item>().check_type();
-                i_midi.GetComponent<midi_item>().btn_view.SetActive(true);
-                i_midi.transform.SetParent(this.box_list_midi.area_all_item);
-                i_midi.transform.localScale = new Vector3(1f, 1f, 0f);
+                IDictionary data = fc.fire_document[i].Get_IDictionary();
+                Carrot_Box_Item item_midi = this.box_list_midi.create_item("item_midi_" + i);
+                item_midi.set_icon(icon);
+                item_midi.set_title(data["name"].ToString());
+                item_midi.set_tip(data["id"].ToString());
+                item_midi.set_act(() => p.m.Show_by_data(data));
             }
-            Carrot.Carrot_Box_Btn_Item btn_search= this.box_list_midi.create_btn_menu_header(p.carrot.icon_carrot_search);
+            Carrot_Box_Btn_Item btn_search = this.box_list_midi.create_btn_menu_header(p.carrot.icon_carrot_search);
             btn_search.set_act(func_search);
             this.box_list_midi.update_color_table_row();
         }
         else
         {
             p.carrot.show_msg(PlayerPrefs.GetString("list_midi_online", "List Midi Online"), PlayerPrefs.GetString("none_midi_search", "No related midi compositions found"), Carrot.Msg_Icon.Alert);
-        }
-    }
-
-    private void act_get_list_midi_public_your(string s_data)
-    {
-        IList list_midi = (IList)Carrot.Json.Deserialize(s_data);
-        if (list_midi.Count > 0)
-        {
-            Carrot.Carrot_Box box_midi_public_your=p.carrot.Create_Box(PlayerPrefs.GetString("list_midi_your_public", "Your published midi list"), icon_list_online);
-            for (int i = 0; i < list_midi.Count; i++)
-            {
-                IDictionary m_dimi = (IDictionary)list_midi[i];
-                GameObject i_midi = Instantiate(item_midi_prefab);
-                i_midi.GetComponent<midi_item>().id_midi = m_dimi["id_midi"].ToString();
-                i_midi.GetComponent<midi_item>().index = -1;
-                i_midi.GetComponent<midi_item>().txt_name.text = m_dimi["name"].ToString();
-                i_midi.GetComponent<midi_item>().name_midi = m_dimi["name"].ToString();
-                i_midi.GetComponent<midi_item>().link = m_dimi["link"].ToString();
-                i_midi.GetComponent<midi_item>().speed = float.Parse(m_dimi["speed"].ToString());
-                i_midi.GetComponent<midi_item>().check_type();
-                i_midi.GetComponent<midi_item>().btn_upload.SetActive(false);
-                i_midi.GetComponent<midi_item>().btn_view.SetActive(true);
-                i_midi.GetComponent<midi_item>().type_edit = 1;
-                if (m_dimi["sell"].ToString() == "2") i_midi.GetComponent<midi_item>().btn_delete.SetActive(false);
-                i_midi.transform.SetParent(box_midi_public_your.area_all_item);
-                i_midi.transform.localScale = new Vector3(1f, 1f, 0f);
-            }
-            box_midi_public_your.update_color_table_row();
-        }
-        else
-        {
-            p.carrot.show_msg(PlayerPrefs.GetString("list_midi_your_public", "Your published midi list"), PlayerPrefs.GetString("none_midi_public", "You don't have any published midi compositions yet !"), Carrot.Msg_Icon.Alert);
         }
     }
 
@@ -280,10 +224,9 @@ public class midi_list : MonoBehaviour
             m.s_data_type = data_midi["data_type"].ToString();
             m.speed = float.Parse(data_midi["speed"].ToString());
             m.type_edit = 1;
-            p.load_midi(m);
+            p.m.Show_by_data(data_midi);
             Destroy(m_obj);
         }
-
     }
 
     public void btn_show_list_category()

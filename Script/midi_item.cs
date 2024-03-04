@@ -81,10 +81,6 @@ public class midi_item : MonoBehaviour
         {
             GameObject.Find("piano").GetComponent<midi_list>().get_midi_by_id(id_midi);
         }
-        else
-        {
-            GameObject.Find("piano").GetComponent<piano>().load_midi(this);
-        }
     }
 
     public void upload()

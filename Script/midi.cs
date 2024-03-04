@@ -386,6 +386,22 @@ public class midi : MonoBehaviour
         scroll_all_line.horizontalNormalizedPosition = Mathf.Clamp(scroll_all_line.horizontalNormalizedPosition, 0f, 0f);
     }
 
+    public void Show_by_data(IDictionary data)
+    {
+        this.Show_editor();
+        IList data_index = (IList)Carrot.Json.Deserialize(data["data_index"].ToString());
+        IList data_type = (IList)Carrot.Json.Deserialize(data["data_type"].ToString());
+        IList arr_index_0 = (IList)data_index[0];
+        length_midi_note = arr_index_0.Count;
+        sel_index_line = 0;
+        for (int i = 0; i < data_index.Count; i++)
+        {
+            IList arr_index = (IList)data_index[i];
+            IList arr_type = (IList)data_type[i];
+            add_line_midi_from_data(arr_index, arr_type);
+        }
+    }
+
     public void show_speed_setting()
     {
         p.carrot.play_sound_click();
