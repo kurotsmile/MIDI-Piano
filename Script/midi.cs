@@ -1,7 +1,10 @@
-﻿using System.Collections;
+﻿using Carrot;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.UI;
 
 public class midi : MonoBehaviour
@@ -45,8 +48,6 @@ public class midi : MonoBehaviour
     public Text txt_timer_speed;
     public Text txt_timer_speed_setting;
     public Slider slider_speed;
-
-    private int type_edit_midi = 0;
 
     public void Show_editor()
     {
@@ -343,17 +344,26 @@ public class midi : MonoBehaviour
             data_type_piano_save.Add(list_midi_line[i].get_arr_type_note_piano());
         }
 
-        string s_data_index = Carrot.Json.Serialize(data_index_piano_save);
-        string s_data_type = Carrot.Json.Serialize(data_type_piano_save);
+        string s_data_index = Json.Serialize(data_index_piano_save);
+        string s_data_type = Json.Serialize(data_type_piano_save);
+
+        IDictionary data = (IDictionary)Json.Deserialize("{}");
+        data["id"]="midi" + p.carrot.generateID();
+        data["name"] = inp_name_midi.text;
+        data["speed"] = speed.ToString();
+        data["data_type"] = s_data_type;
+        data["data_index"] = s_data_index;
+        data["status"] = "offline";
+        data["date"] = DateTime.Now.ToString();
 
         if (index_midi_edit == -1)
-            p.m_list.add_item_midi(inp_name_midi.text, s_data_index, s_data_type, speed, type_edit_midi);
+            p.m_list.Save_midi(data);
         else
-            p.m_list.upadte_item_midi(index_midi_edit, inp_name_midi.text, s_data_index, s_data_type, speed);
+            p.m_list.Upadte_item_midi(index_midi_edit, data);
     }
 
 
-    public void open_midi(midi_item item_midi)
+    public void Open_midi(IDictionary data)
     {
         this.panel_midi_editor.SetActive(true);
         p.carrot.play_sound_click();
@@ -361,18 +371,20 @@ public class midi : MonoBehaviour
         p.panel_menu_mini.SetActive(false);
         gameObject.SetActive(true);
         panel_midi_speed.SetActive(false);
-        speed = item_midi.speed;
-        type_edit_midi = item_midi.type_edit;
+        speed = float.Parse(data["speed"].ToString());
         txt_timer_speed.text = speed.ToString() + "s";
-        index_midi_edit = item_midi.index;
-        inp_name_midi.text = item_midi.name_midi;
+        if (data["index"] != null)
+            index_midi_edit =int.Parse(data["index"].ToString());
+        else
+            index_midi_edit = -1;
+        inp_name_midi.text = data["name"].ToString();
         panel_menu_act.SetActive(true);
 
         clear_all_line();
 
 
-        IList data_index = (IList)Carrot.Json.Deserialize(item_midi.s_data_index);
-        IList data_type = (IList)Carrot.Json.Deserialize(item_midi.s_data_type);
+        IList data_index = (IList)Json.Deserialize(data["data_index"].ToString());
+        IList data_type = (IList)Json.Deserialize(data["data_type"].ToString());
         IList arr_index_0 = (IList)data_index[0];
         length_midi_note = arr_index_0.Count;
         sel_index_line = 0;
@@ -385,22 +397,6 @@ public class midi : MonoBehaviour
 
         Canvas.ForceUpdateCanvases();
         scroll_all_line.horizontalNormalizedPosition = Mathf.Clamp(scroll_all_line.horizontalNormalizedPosition, 0f, 0f);
-    }
-
-    public void Show_by_data(IDictionary data)
-    {
-        this.Show_editor();
-        IList data_index = (IList)Carrot.Json.Deserialize(data["data_index"].ToString());
-        IList data_type = (IList)Carrot.Json.Deserialize(data["data_type"].ToString());
-        IList arr_index_0 = (IList)data_index[0];
-        length_midi_note = arr_index_0.Count;
-        sel_index_line = 0;
-        for (int i = 0; i < data_index.Count; i++)
-        {
-            IList arr_index = (IList)data_index[i];
-            IList arr_type = (IList)data_type[i];
-            add_line_midi_from_data(arr_index, arr_type);
-        }
     }
 
     public void show_speed_setting()
@@ -444,22 +440,30 @@ public class midi : MonoBehaviour
             arr_note_type[i] = list_midi_line[0].get_midi_note(i).type_note_piano;
         }
 
-        Debug.Log(Carrot.Json.Serialize(arr_note_index));
-        Debug.Log(Carrot.Json.Serialize(arr_note_type));
+        List<MidiEvent> midiEvents = new()
+        {
+            new MidiEvent(MidiEventType.NoteOn, 0, 0, 60, 100),
+            new MidiEvent(MidiEventType.NoteOff, 1, 1, 60, 100),
+            new MidiEvent(MidiEventType.NoteOff, 2, 0, 60, 100)
+        };
 
-        List<MidiEvent> midiEvents = new();
-        midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 0, 0, 60, 100));
-        midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 1, 0, 60, 100));
-        midiEvents.Add(new MidiEvent(MidiEventType.NoteOn, 2, 0, 60, 100));
-        WriteMidiFile(Application.persistentDataPath+"/example.mid", midiEvents);
-        p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!"), Carrot.Msg_Icon.Success);
+        if (Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite))
+        {
+            string fullPath = Path.Combine(Application.persistentDataPath, inp_name_midi.text+".mid");
+            WriteMidiFile(fullPath, midiEvents);
+            p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!")+" "+fullPath, Carrot.Msg_Icon.Success);
+        }
+        else
+        {
+            Permission.RequestUserPermission(Permission.ExternalStorageWrite);
+        }
     }
 
     void WriteMidiFile(string fileName, List<MidiEvent> events)
     {
-        using (FileStream stream = new FileStream(fileName, FileMode.Create))
+        using (FileStream stream = new(fileName, FileMode.Create))
         {
-            BinaryWriter writer = new BinaryWriter(stream);
+            BinaryWriter writer = new(stream);
 
             writer.Write(new char[] { 'M', 'T', 'h', 'd' });
             writer.Write(6);

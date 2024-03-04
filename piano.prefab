@@ -2661,7 +2661,7 @@ GameObject:
   - component: {fileID: 416982332116397946}
   - component: {fileID: 3624153443424814078}
   m_Layer: 5
-  m_Name: btn_midi_close
+  m_Name: btn_midi_speed_close
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4225,11 +4225,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   p: {fileID: 7001318967239774822}
   icon: {fileID: 21300000, guid: c2725bcb4e4a1a74795a54a4d0fc6cb9, type: 3}
+  icon_public: {fileID: 21300000, guid: 59d6baf78ddd25a43b921578359ed354, type: 3}
+  icon_pendding: {fileID: 21300000, guid: 973b2a4c7c325c44ebbfadb849f4a16d, type: 3}
   icon_list_online: {fileID: 21300000, guid: d6b1ac2c1a5d4f348a3d90a53979a921, type: 3}
   icon_list_category: {fileID: 21300000, guid: 5c559acd88e04a2448ee8ba087c55f9d, type: 3}
   icon_midi_buy: {fileID: 21300000, guid: 2f0c9c3deb6989e4eb2bfbeb942705e5, type: 3}
-  item_midi_prefab: {fileID: 3944392426914461075, guid: abc9de2a93f6d9b428232e80e3821730,
-    type: 3}
+  icon_upload: {fileID: 21300000, guid: 1dc5cc75de8f1e840a9381cb3d0015cc, type: 3}
 --- !u!114 &9082111594301685719
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8971,7 +8972,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 49863207559238561}
         m_TargetAssemblyTypeName: midi, Assembly-CSharp
         m_MethodName: change_speed_midi
         m_Mode: 1
@@ -19353,7 +19354,7 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
@@ -19363,12 +19364,12 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
@@ -19418,7 +19419,7 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -28
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
