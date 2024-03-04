@@ -389,7 +389,7 @@ public class midi_list : MonoBehaviour
         item_status.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("sell"));
 
         string s_status = data["status"].ToString();
-        if (s_status == "pendding") item_status.set_val("0");
+        if (s_status == "pending") item_status.set_val("0");
         if (s_status == "public") item_status.set_val("1");
         if (s_status == "sell") item_status.set_val("2");
 
@@ -409,11 +409,20 @@ public class midi_list : MonoBehaviour
 
     private void Act_change_status_midi(IDictionary data,string s_status,string s_category)
     {
-        string s_val_status = "pendding";
-        data["status"] = "";
+        string s_val_status = "pending";
+        if (s_status == "0") s_val_status = "pending";
+        if (s_status == "1") s_val_status = "public";
+        if (s_status == "2") s_val_status = "sell";
+        data["status"] = s_val_status;
         data["category"] = s_category;
-        p.carrot.show_msg(s_status);
         string s_json = p.carrot.server.Convert_IDictionary_to_json(data);
-        p.carrot.server.Add_Document_To_Collection(p.carrot.Carrotstore_AppId, data["id"].ToString(), s_json, Act_upload_midi_done,Act_fail);
+        p.carrot.show_loading();
+        p.carrot.server.Add_Document_To_Collection(p.carrot.Carrotstore_AppId, data["id"].ToString(), s_json, Act_change_status_done, Act_fail);
+    }
+
+    private void Act_change_status_done(string s_data)
+    {
+        p.carrot.hide_loading();
+        p.carrot.show_msg("Midi (Dev)", "Change status success!", Msg_Icon.Success);
     }
 }
