@@ -4198,7 +4198,6 @@ MonoBehaviour:
   rec_view_piano: {fileID: 1773212870603780829}
   img_lock_key: {fileID: 1814720347317534172}
   img_text_key: {fileID: 6613762731429145133}
-  img_recod: {fileID: 6561382285053286240}
   img_effect: {fileID: 7761286465988358992}
   txt_show_name_note: {fileID: 5478210337986974799}
   effect_play: {fileID: 5201019800195187150}
@@ -4364,6 +4363,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   p: {fileID: 7001318967239774822}
   panel_midi_editor: {fileID: 7326114911294658052}
+  img_recod: {fileID: 6561382285053286240}
   midi_line_prefab: {fileID: 7785693659216013596, guid: c48f5a16ba2019c4a854f5bacf9586b0,
     type: 3}
   scroll_all_line: {fileID: 9166459406005544486}
@@ -7916,7 +7916,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 49863207559238561}
         m_TargetAssemblyTypeName: midi, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: Close
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10182,9 +10182,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7001318967239774822}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: show_or_hide_midi_editor
+      - m_Target: {fileID: 49863207559238561}
+        m_TargetAssemblyTypeName: midi, Assembly-CSharp
+        m_MethodName: Show_editor
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -19353,7 +19353,7 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
@@ -19363,12 +19363,12 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
@@ -19418,7 +19418,7 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -28
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}

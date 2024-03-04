@@ -10,6 +10,7 @@ public class midi : MonoBehaviour
 
     [Header("Obj Midi")]
     public GameObject panel_midi_editor;
+    public Image img_recod;
     private bool is_play = false;
     private int sel_index_line = 0;
     private int length_midi_note = 0;
@@ -48,6 +49,7 @@ public class midi : MonoBehaviour
 
     public void Show_editor()
     {
+        p.carrot.play_sound_click();
         this.load_midi();
     }
 
@@ -60,6 +62,11 @@ public class midi : MonoBehaviour
         inp_name_midi.text = "";
         panel_midi_speed.SetActive(false);
         clear_midi();
+
+        panel_midi_editor.SetActive(true);
+        p.panel_menu_top.SetActive(false);
+        p.panel_menu_mini.SetActive(false);
+        p.carrot.ads.Destroy_Banner_Ad();
     }
 
     public void clear_midi()
@@ -393,14 +400,19 @@ public class midi : MonoBehaviour
         speed = slider_speed.value;
     }
 
-    public void close()
+    public void Close()
     {
         this.panel_midi_editor.SetActive(false);
         this.p.panel_menu_top.SetActive(true);
+        this.p.panel_menu_mini.SetActive(true);
         p.carrot.play_sound_click();
         p.rest_color_all_note();
         img_play_midi.sprite = icon_play;
         is_play = false;
+        p.set_use_keyboar_pc();
+        img_recod.color = Color.white;
+        p.carrot.ads.show_ads_Interstitial();
+        p.carrot.ads.create_banner_ads();
     }
 
     public void btn_export_midi()

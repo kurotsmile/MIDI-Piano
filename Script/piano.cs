@@ -36,7 +36,6 @@ public class piano : MonoBehaviour
     public ScrollRect rec_view_piano;
     public Image img_lock_key;
     public Image img_text_key;
-    public Image img_recod;
     public Image img_effect;
     public Text txt_show_name_note;
     public GameObject effect_play;
@@ -49,7 +48,7 @@ public class piano : MonoBehaviour
 
     private string link_deep_app;
     private bool is_open_list_after_login = false;
-    private bool is_user_keyboar = true;
+    private bool is_used_keyboar = true;
 
     private void Start()
     {
@@ -122,7 +121,7 @@ public class piano : MonoBehaviour
     {
         if (m.panel_midi_editor.activeInHierarchy)
         {
-            close_midi_editor();
+            m.Close();
             carrot.set_no_check_exit_app();
         }
         else
@@ -135,10 +134,9 @@ public class piano : MonoBehaviour
         }
     }
 
-#if !UNITY_ANDROID
     private void Update()
     {
-        if (this.is_user_keyboar)
+        if (this.is_used_keyboar)
         {
 
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
@@ -155,7 +153,6 @@ public class piano : MonoBehaviour
         }
   
     }
-#endif
 
     public void btn_change_type_note_txt()
     {
@@ -228,37 +225,6 @@ public class piano : MonoBehaviour
             scroll_piano.interactable = true;
             rec_view_piano.enabled = true;
         }
-    }
-
-    public void show_or_hide_midi_editor()
-    {
-        this.carrot.ads.show_ads_Interstitial();
-        this.carrot.play_sound_click();
-        if (m.panel_midi_editor.activeInHierarchy)
-            close_midi_editor();
-        else
-            show_midi_editor();
-    }
-
-    public void close_midi_editor()
-    {
-        m.close();
-        panel_menu_top.SetActive(true);
-        panel_menu_mini.SetActive(true);
-        img_recod.color = Color.white;
-        ShowInterstitialAd();
-        this.carrot.ads.create_banner_ads();
-        is_user_keyboar = true;
-    }
-
-    private void show_midi_editor()
-    {
-        m.panel_midi_editor.SetActive(true);
-        panel_menu_top.SetActive(false);
-        m.Show_editor();
-        img_recod.color = Color.red;
-        panel_menu_mini.SetActive(false);
-        this.carrot.ads.Destroy_Banner_Ad();
     }
 
     public void play_note(int index, int type_note, bool is_pos_mouse)
@@ -423,7 +389,7 @@ public class piano : MonoBehaviour
     public void btn_show_account_login()
     {
         this.carrot.ads.show_ads_Interstitial();
-        is_user_keyboar = false;
+        is_used_keyboar = false;
         is_open_list_after_login = false;
         carrot.show_login();
     }
@@ -505,7 +471,7 @@ public class piano : MonoBehaviour
 
     public void btn_show_list_midi_public_by_me()
     {
-        is_user_keyboar = false;
+        is_used_keyboar = false;
         if (carrot.user.get_id_user_login() == "")
         {
             carrot.show_login();
@@ -541,12 +507,12 @@ public class piano : MonoBehaviour
 
     public void set_use_keyboar_pc()
     {
-        is_user_keyboar = true;
+        is_used_keyboar = true;
     }
 
     public void set_no_use_keyboar_pc()
     {
-        is_user_keyboar = false;
+        is_used_keyboar = false;
     }
 
     void OnApplicationFocus(bool hasFocus)
@@ -571,5 +537,4 @@ public class piano : MonoBehaviour
     {
         this.musical_instruments.on_success_rewarded_musical_instruments();
     }
-
 }

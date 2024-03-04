@@ -33,7 +33,7 @@ public class midi_list : MonoBehaviour
         PlayerPrefs.SetInt("m_" + leng_midi + "_type", type);
         leng_midi++;
         PlayerPrefs.SetInt("leng_m", leng_midi);
-        p.close_midi_editor();
+        p.m.Close();
         Check_midi();
         show_list();
     }
@@ -45,7 +45,7 @@ public class midi_list : MonoBehaviour
         PlayerPrefs.SetString("m_" + index_update + "_data_index", _data_index);
         PlayerPrefs.SetString("m_" + index_update + "_data_type", _data_type);
         PlayerPrefs.SetFloat("m_" + index_update + "_speed", speed);
-        p.close_midi_editor();
+        p.m.Close();
         Check_midi();
         show_list();
     }

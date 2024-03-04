@@ -11,7 +11,7 @@ public class midi_note : MonoBehaviour
     public Text txt;
     public void click()
     {
-        GameObject.Find("midi").GetComponent<midi>().select_midi_note(this);
+        GameObject.Find("piano").GetComponent<midi>().select_midi_note(this);
     }
 
     public void play(Color32 colr)
