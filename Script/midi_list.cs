@@ -22,7 +22,9 @@ public class midi_list : MonoBehaviour
     private int leng_midi = 0;
     private Carrot_Box box_list_midi;
     private UnityAction<string> act_sel_category;
-    private Carrot_Box_Item item_category;
+    private Carrot_Box_Item item_cat_category;
+    private Carrot_Box_Item item_cat_buy;
+    private Carrot_Box_Item item_cat_status;
     private Carrot_Box box_category;
     private Carrot_Box box_edit;
     private Type_List_MIDI type;
@@ -272,7 +274,7 @@ public class midi_list : MonoBehaviour
 
             if (type == Type_List_MIDI.Pending)
             {
-                Carrot_Box_Btn_Item btn_pending = this.box_list_midi.create_btn_menu_header(icon_pendding);
+                Carrot_Box_Btn_Item btn_pending = this.box_list_midi.create_btn_menu_header(icon_public);
                 btn_pending.set_act(() => this.show_list_download_midi());
             }
 
@@ -354,11 +356,20 @@ public class midi_list : MonoBehaviour
                 IDictionary data_cat = fc.fire_document[i].Get_IDictionary();
                 Carrot_Box_Item item_cat = box_category.create_item("item_cat_" + i);
                 var name_cat = data_cat["name"].ToString();
+                var id_cat = data_cat["id"].ToString();
                 item_cat.set_title(data_cat["name"].ToString());
                 item_cat.set_tip(data_cat["id"].ToString());
                 item_cat.set_icon(icon_list_category);
+                if (this.act_sel_category != null) item_cat.set_act(() => act_sel_category(name_cat));
+                else item_cat.set_act(() => Show_list_midi_by_category(name_cat));
 
-                if (this.act_sel_category != null) item_cat.set_act(() => act_sel_category(item_cat.get_val()));
+                if (p.carrot.model_app == ModelApp.Develope)
+                {
+                    Carrot_Box_Btn_Item btn_del=item_cat.create_item();
+                    btn_del.set_icon(p.carrot.sp_icon_del_data);
+                    btn_del.set_color(Color.red);
+                    btn_del.set_act(() => Delete_category_from_server(id_cat));
+                }
             }
         }
     }
@@ -415,6 +426,19 @@ public class midi_list : MonoBehaviour
         p.carrot.server.Get_doc(q.ToJson(), this.Act_get_list_midi_online_done);
     }
 
+    private void Delete_category_from_server(string s_id_cat)
+    {
+        p.carrot.show_loading();
+        p.carrot.server.Delete_Doc(PlayerPrefs.GetString("midi_category", "List of midi genres"), s_id_cat, Act_delete_category_done, Act_fail);
+    }
+
+    private void Act_delete_category_done(string s_data)
+    {
+        p.carrot.hide_loading();
+        p.carrot.show_msg("Midi", "Delete category Success!", Msg_Icon.Success);
+        if (box_category != null) box_category.close();
+    }
+
     private void Delete_midi_from_server(string s_id_midi)
     {
         p.carrot.show_loading();
@@ -442,38 +466,56 @@ public class midi_list : MonoBehaviour
         box_edit.set_title("Change status MIDI (" + data["name"].ToString() + ")");
         box_edit.set_icon(this.p.carrot.user.icon_user_status);
 
-        item_category = box_edit.create_item();
-        item_category.set_icon(this.p.carrot.icon_carrot_all_category);
-        item_category.set_title("Category");
-        item_category.set_tip("Select category for MIDI");
-        item_category.set_type(Box_Item_Type.box_value_input);
-        item_category.check_type();
+        item_cat_category = box_edit.create_item();
+        item_cat_category.set_icon(this.p.carrot.icon_carrot_all_category);
+        item_cat_category.set_title("Category");
+        item_cat_category.set_tip("Select category for MIDI");
+        item_cat_category.set_type(Box_Item_Type.box_value_input);
+        item_cat_category.check_type();
 
-        Carrot_Box_Btn_Item btn_sel_cat = item_category.create_item();
+        if (data["category"] != null) item_cat_category.set_val(data["category"].ToString());
+
+        Carrot_Box_Btn_Item btn_sel_cat = item_cat_category.create_item();
         btn_sel_cat.set_icon(this.icon_list_category);
         btn_sel_cat.set_color(p.carrot.color_highlight);
         btn_sel_cat.set_act(() => this.Show_list_category(this.Select_Category_for_Edit));
 
-        Carrot_Box_Item item_status = box_edit.create_item();
-        item_status.set_icon(this.p.carrot.user.icon_user_info);
-        item_status.set_title("Status");
-        item_status.set_tip("Select status for MIDI");
-        item_status.set_type(Box_Item_Type.box_value_dropdown);
-        item_status.check_type();
+        item_cat_status = box_edit.create_item();
+        item_cat_status.set_icon(this.p.carrot.user.icon_user_info);
+        item_cat_status.set_title("Status");
+        item_cat_status.set_tip("Select status for MIDI");
+        item_cat_status.set_type(Box_Item_Type.box_value_dropdown);
+        item_cat_status.check_type();
 
-        item_status.dropdown_val.ClearOptions();
-        item_status.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("pedding"));
-        item_status.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("public"));
-        item_status.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("sell"));
+        item_cat_status.dropdown_val.ClearOptions();
+        item_cat_status.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("pedding"));
+        item_cat_status.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("public"));
 
         string s_status = data["status"].ToString();
-        if (s_status == "pending") item_status.set_val("0");
-        if (s_status == "public") item_status.set_val("1");
-        if (s_status == "sell") item_status.set_val("2");
+        if (s_status == "pending") item_cat_status.set_val("0");
+        if (s_status == "public") item_cat_status.set_val("1");
+
+        item_cat_buy = box_edit.create_item();
+        item_cat_buy.set_icon(icon_midi_buy);
+        item_cat_buy.set_type("Sell");
+        item_cat_buy.set_type("Set buy Midi");
+        item_cat_buy.set_type(Box_Item_Type.box_value_dropdown);
+        item_cat_buy.check_type();
+
+        item_cat_buy.dropdown_val.ClearOptions();
+        item_cat_buy.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("Free"));
+        item_cat_buy.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("Buy"));
+
+        if (data["buy"] != null)
+        {
+            string s_buy = data["buy"].ToString();
+            if (s_buy == "0") item_cat_buy.set_val("0");
+            if (s_buy == "1") item_cat_buy.set_val("1");
+        }
 
         Carrot_Box_Btn_Panel panel_btn = box_edit.create_panel_btn();
         Carrot_Button_Item btn_done=panel_btn.create_btn();
-        btn_done.set_act_click(() => Act_change_status_midi(data, item_status.get_val(),item_category.get_val()));
+        btn_done.set_act_click(() => Act_change_status_midi(data));
         btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
         btn_done.set_bk_color(p.carrot.color_highlight);
         btn_done.set_icon(p.carrot.icon_carrot_done);
@@ -487,19 +529,20 @@ public class midi_list : MonoBehaviour
 
     private void Select_Category_for_Edit(string s_name_category)
     {
+        p.carrot.show_msg(s_name_category);
         p.carrot.play_sound_click();
-        this.item_category.set_val(s_name_category);
+        this.item_cat_category.set_val(s_name_category);
         if (box_category != null) box_category.close();
     }
 
-    private void Act_change_status_midi(IDictionary data,string s_status,string s_category)
+    private void Act_change_status_midi(IDictionary data)
     {
         string s_val_status = "pending";
-        if (s_status == "0") s_val_status = "pending";
-        if (s_status == "1") s_val_status = "public";
-        if (s_status == "2") s_val_status = "sell";
+        if (item_cat_status.get_val() == "0") s_val_status = "pending";
+        if (item_cat_status.get_val() == "1") s_val_status = "public";
         data["status"] = s_val_status;
-        data["category"] = s_category;
+        data["category"] = item_cat_category.get_val();
+        data["buy"] = item_cat_buy.get_val();
         string s_json = p.carrot.server.Convert_IDictionary_to_json(data);
         p.carrot.show_loading();
         p.carrot.server.Add_Document_To_Collection(p.carrot.Carrotstore_AppId, data["id"].ToString(), s_json, Act_change_status_done, Act_fail);

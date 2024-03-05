@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 public class musical_instruments_manager : MonoBehaviour
 {
+    [Header("Obj Main")]
+    public piano p;
+    [Header("Obj Musical Instruments")]
     public Image img_musical_instruments;
     public GameObject[] obj_musical_instruments_data;
     public GameObject musical_instruments_item_prefab;
@@ -21,7 +24,7 @@ public class musical_instruments_manager : MonoBehaviour
 
     public void show_list_musical_instruments()
     {
-        this.box_musical_instruments=GetComponent<piano>().carrot.Create_Box(PlayerPrefs.GetString("musical_instruments","Musical Instruments"), img_musical_instruments.sprite);
+        this.box_musical_instruments=p.carrot.Create_Box(PlayerPrefs.GetString("musical_instruments","Musical Instruments"), img_musical_instruments.sprite);
         for (int i = 0; i < obj_musical_instruments_data.Length; i++)
         {
             GameObject item_m = Instantiate(this.musical_instruments_item_prefab);
@@ -34,7 +37,7 @@ public class musical_instruments_manager : MonoBehaviour
             m_emp.txt_name.text= m_data.s_name;
             m_emp.index = i;
             m_emp.is_buy = m_data.is_buy;
-            if (this.sel_musical_instruments == i) item_m.GetComponent<Image>().color = this.GetComponent<piano>().carrot.color_highlight;
+            if (this.sel_musical_instruments == i) item_m.GetComponent<Image>().color = p.carrot.color_highlight;
             if (m_data.is_buy)
             {
                 if(PlayerPrefs.GetInt("musical_instruments_"+i, 0) == 0)
@@ -56,20 +59,20 @@ public class musical_instruments_manager : MonoBehaviour
         PlayerPrefs.SetInt("sel_musical_instruments", index_m);
         this.sel_musical_instruments = index_m;
         this.load_musical_instruments_by_index(index_m);
-        GameObject.Find("piano").GetComponent<piano>().carrot.close();
+        p.carrot.close();
     }
 
     private void load_musical_instruments_by_index(int index_m)
     {
         musical_instruments_data m_data = obj_musical_instruments_data[index_m].GetComponent<musical_instruments_data>();
-        for(int i = 0; i < this.GetComponent<piano>().note_black.Length; i++)
+        for(int i = 0; i < p.note_black.Length; i++)
         {
-            this.GetComponent<piano>().note_black[i].sound_piano.clip = m_data.note_black[i];
+            p.note_black[i].sound_piano.clip = m_data.note_black[i];
         }
 
-        for (int i = 0; i < this.GetComponent<piano>().note_white.Length; i++)
+        for (int i = 0; i < p.note_white.Length; i++)
         {
-            this.GetComponent<piano>().note_white[i].sound_piano.clip = m_data.note_white[i];
+            p.note_white[i].sound_piano.clip = m_data.note_white[i];
         }
         this.img_musical_instruments.sprite = m_data.icon;
         this.s_name_instruments = m_data.s_name;
@@ -91,7 +94,7 @@ public class musical_instruments_manager : MonoBehaviour
         if (this.index_buy_musical_instruments != -1)
         {
             this.load_musical_instruments_by_index(this.index_buy_musical_instruments);
-            this.GetComponent<piano>().carrot.close();
+            p.carrot.close();
         }
     }
 

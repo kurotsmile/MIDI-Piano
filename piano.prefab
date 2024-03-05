@@ -4473,6 +4473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68a7bfab295bd4148bb66952cb86dbcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  p: {fileID: 7001318967239774822}
   img_musical_instruments: {fileID: 2707054430369951617}
   obj_musical_instruments_data:
   - {fileID: 4544377597632438283, guid: 196fc3a3b262c9e4e8d540efdb8823eb, type: 3}
