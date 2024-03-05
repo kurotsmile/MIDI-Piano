@@ -364,9 +364,9 @@ public class midi : MonoBehaviour
             p.m_list.Upadte_item_midi(index_midi_edit, data);
     }
 
-
     public void Open_midi(IDictionary data)
     {
+        p.carrot.ads.Destroy_Banner_Ad();
         this.panel_midi_editor.SetActive(true);
         p.carrot.play_sound_click();
         p.panel_menu_top.SetActive(false);
@@ -383,7 +383,6 @@ public class midi : MonoBehaviour
         panel_menu_act.SetActive(true);
 
         clear_all_line();
-
 
         IList data_index = (IList)Json.Deserialize(data["data_index"].ToString());
         IList data_type = (IList)Json.Deserialize(data["data_type"].ToString());

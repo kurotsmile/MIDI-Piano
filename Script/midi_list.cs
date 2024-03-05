@@ -3,6 +3,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
+public enum Type_List_MIDI {Pending,Public}
+
 public class midi_list : MonoBehaviour
 {
     [Header("Main Obj")]
@@ -23,12 +25,14 @@ public class midi_list : MonoBehaviour
     private Carrot_Box_Item item_category;
     private Carrot_Box box_category;
     private Carrot_Box box_edit;
-
+    private Type_List_MIDI type;
+    private string s_data_list_midi_public = "";
     private string s_title_box;
 
     public void Check_midi()
     {
         leng_midi = PlayerPrefs.GetInt("leng_m");
+        if (p.carrot.is_offline()) s_data_list_midi_public = PlayerPrefs.GetString("s_data_list_midi_public");
     }
 
     public void Save_midi(IDictionary data)
@@ -199,6 +203,7 @@ public class midi_list : MonoBehaviour
 
     public void show_list_download_midi()
     {
+        type = Type_List_MIDI.Public;
         p.carrot.ads.show_ads_Interstitial();
         s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
@@ -209,6 +214,7 @@ public class midi_list : MonoBehaviour
 
     private void show_list_pending_midi()
     {
+        type = Type_List_MIDI.Pending;
         p.carrot.ads.show_ads_Interstitial();
         s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
@@ -229,16 +235,46 @@ public class midi_list : MonoBehaviour
     private void Act_get_list_midi_online_done(string s_data)
     {
         p.carrot.hide_loading();
+        if (type == Type_List_MIDI.Public)
+        {
+            if (this.s_data_list_midi_public == "")
+            {
+                this.s_data_list_midi_public = s_data;
+                PlayerPrefs.SetString("s_data_list_midi_public", s_data);
+                this.Show_List_By_data(s_data);
+            }
+            else
+            {
+                this.Show_List_By_data(s_data_list_midi_public);
+            }
+        }
+        else
+        {
+            this.Show_List_By_data(s_data);
+        }
+    }
+
+    private void Show_List_By_data(string s_data)
+    {
         Fire_Collection fc = new(s_data);
         if (!fc.is_null)
         {
             if (this.box_list_midi != null) this.box_list_midi.close();
             this.box_list_midi = p.carrot.Create_Box(s_title_box, icon_list_online);
-            Carrot_Box_Btn_Item btn_cat=this.box_list_midi.create_btn_menu_header(p.carrot.icon_carrot_all_category);
+            Carrot_Box_Btn_Item btn_cat = this.box_list_midi.create_btn_menu_header(p.carrot.icon_carrot_all_category);
             btn_cat.set_act(() => this.Btn_show_list_category());
 
-            Carrot_Box_Btn_Item btn_pending = this.box_list_midi.create_btn_menu_header(icon_pendding);
-            btn_pending.set_act(() => this.show_list_pending_midi());
+            if (type == Type_List_MIDI.Public)
+            {
+                Carrot_Box_Btn_Item btn_pending = this.box_list_midi.create_btn_menu_header(icon_pendding);
+                btn_pending.set_act(() => this.show_list_pending_midi());
+            }
+
+            if (type == Type_List_MIDI.Pending)
+            {
+                Carrot_Box_Btn_Item btn_pending = this.box_list_midi.create_btn_menu_header(icon_pendding);
+                btn_pending.set_act(() => this.show_list_download_midi());
+            }
 
             for (int i = 0; i < fc.fire_document.Length; i++)
             {
@@ -246,6 +282,7 @@ public class midi_list : MonoBehaviour
                 var id_midi = data["id"].ToString();
                 Add_Item_to_box(this.box_list_midi, data);
             }
+
             Carrot_Box_Btn_Item btn_search = this.box_list_midi.create_btn_menu_header(p.carrot.icon_carrot_search);
             btn_search.set_act(func_search);
             this.box_list_midi.update_color_table_row();
@@ -470,6 +507,7 @@ public class midi_list : MonoBehaviour
 
     private void Act_change_status_done(string s_data)
     {
+        s_data_list_midi_public = "";
         p.carrot.hide_loading();
         p.carrot.show_msg("Midi (Dev)", "Change status success!", Msg_Icon.Success);
         if (box_list_midi != null) box_list_midi.close();
