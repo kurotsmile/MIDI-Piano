@@ -1,6 +1,7 @@
 ﻿using Carrot;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class midi_list : MonoBehaviour
 {
@@ -15,8 +16,13 @@ public class midi_list : MonoBehaviour
     public Sprite icon_midi_buy;
     public Sprite icon_upload;
     public Sprite icon_export;
+
     private int leng_midi = 0;
     private Carrot_Box box_list_midi;
+    private UnityAction<string> act_sel_category;
+    private Carrot_Box_Item item_category;
+    private Carrot_Box box_category;
+    private Carrot_Box box_edit;
 
     private string s_title_box;
 
@@ -95,7 +101,7 @@ public class midi_list : MonoBehaviour
             Carrot_Box_Btn_Item btn_del = item_m.create_item();
             btn_del.set_icon(p.carrot.sp_icon_del_data);
             btn_del.set_color(p.carrot.color_highlight);
-            btn_del.set_act(() => delete(int.Parse(data["index"].ToString())));
+            btn_del.set_act(() => Delete(int.Parse(data["index"].ToString())));
         }
         else
         {
@@ -140,7 +146,6 @@ public class midi_list : MonoBehaviour
         p.carrot.show_search( Act_done_search, PlayerPrefs.GetString("search_midi_tip", "You can Search for midi songs online, for reference and use for composition purposes"));
     }
 
-
     private void Act_done_search(string s_data)
     {
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
@@ -148,15 +153,15 @@ public class midi_list : MonoBehaviour
         p.carrot.server.Get_doc(q.ToJson(), this.Act_get_list_midi_online_done);
     }
 
-    public void delete(int index)
+    public void Delete(int index)
     {
         PlayerPrefs.DeleteKey("m_data_"+index);
-        check_after_delete();
+        Check_after_delete();
         Check_midi();
         show_list();
     }
 
-    private void check_after_delete()
+    private void Check_after_delete()
     {
         int count_item = 0;
         for(int i = 0; i < this.leng_midi; i++)
@@ -197,12 +202,24 @@ public class midi_list : MonoBehaviour
         p.carrot.ads.show_ads_Interstitial();
         s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
+        q.Add_where("status", Query_OP.EQUAL, "public");
+        p.carrot.show_loading();
+        p.carrot.server.Get_doc(q.ToJson(), Act_get_list_midi_online_done);
+    }
+
+    private void show_list_pending_midi()
+    {
+        p.carrot.ads.show_ads_Interstitial();
+        s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
+        StructuredQuery q = new(p.carrot.Carrotstore_AppId);
+        q.Add_where("status", Query_OP.EQUAL, "pending");
         p.carrot.show_loading();
         p.carrot.server.Get_doc(q.ToJson(), Act_get_list_midi_online_done);
     }
 
     public void show_list_buy_user_id(string s_user_id)
     {
+        p.carrot.show_loading();
         s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
         q.Add_where("user_id", Query_OP.EQUAL, s_user_id);
@@ -215,9 +232,13 @@ public class midi_list : MonoBehaviour
         Fire_Collection fc = new(s_data);
         if (!fc.is_null)
         {
+            if (this.box_list_midi != null) this.box_list_midi.close();
             this.box_list_midi = p.carrot.Create_Box(s_title_box, icon_list_online);
             Carrot_Box_Btn_Item btn_cat=this.box_list_midi.create_btn_menu_header(p.carrot.icon_carrot_all_category);
             btn_cat.set_act(() => this.Btn_show_list_category());
+
+            Carrot_Box_Btn_Item btn_pending = this.box_list_midi.create_btn_menu_header(icon_pendding);
+            btn_pending.set_act(() => this.show_list_pending_midi());
 
             for (int i = 0; i < fc.fire_document.Length; i++)
             {
@@ -267,19 +288,25 @@ public class midi_list : MonoBehaviour
     public void Btn_show_list_category()
     {
         p.carrot.play_sound_click();
+        Show_list_category(null);
+    }
+
+    private void Show_list_category(UnityAction<string> act_done_sel)
+    {
+        this.act_sel_category = act_done_sel;
         p.ShowInterstitialAd();
         StructuredQuery q = new("midi-category");
-        p.carrot.server.Get_doc(q.ToJson(), Act_show_list_category,Act_fail);
+        p.carrot.server.Get_doc(q.ToJson(), Act_show_list_category, Act_fail);
     }
 
     private void Act_show_list_category(string s_data)
     {
         Fire_Collection fc = new(s_data);
-        Carrot_Box box_list_category =p.carrot.Create_Box(PlayerPrefs.GetString("midi_category", "List of midi genres"), icon_list_category);
+        box_category =p.carrot.Create_Box(PlayerPrefs.GetString("midi_category", "List of midi genres"), icon_list_category);
 
         if (p.carrot.model_app == ModelApp.Develope)
         {
-            Carrot_Box_Btn_Item btn_add_cat = box_list_category.create_btn_menu_header(this.p.carrot.icon_carrot_add);
+            Carrot_Box_Btn_Item btn_add_cat = box_category.create_btn_menu_header(this.p.carrot.icon_carrot_add);
             btn_add_cat.set_act(() => this.Box_add_cat_midi());
         }
 
@@ -288,10 +315,13 @@ public class midi_list : MonoBehaviour
             for (int i = 0; i < fc.fire_document.Length; i++)
             {
                 IDictionary data_cat = fc.fire_document[i].Get_IDictionary();
-                Carrot_Box_Item item_cat = box_list_category.create_item("item_cat_" + i);
+                Carrot_Box_Item item_cat = box_category.create_item("item_cat_" + i);
+                var name_cat = data_cat["name"].ToString();
                 item_cat.set_title(data_cat["name"].ToString());
                 item_cat.set_tip(data_cat["id"].ToString());
                 item_cat.set_icon(icon_list_category);
+
+                if (this.act_sel_category != null) item_cat.set_act(() => act_sel_category(item_cat.get_val()));
             }
         }
     }
@@ -340,7 +370,7 @@ public class midi_list : MonoBehaviour
         p.carrot.show_msg("Category", "Add category success!!!", Msg_Icon.Success);
     }
 
-    public void show_list_midi_by_category(string name_category)
+    private void Show_list_midi_by_category(string name_category)
     {
         s_title_box = name_category;
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
@@ -371,18 +401,23 @@ public class midi_list : MonoBehaviour
 
     private void Change_Status_midi(IDictionary data)
     {
-        Carrot_Box box_public = p.carrot.Create_Box();
-        box_public.set_title("Change status MIDI (" + data["name"].ToString() + ")");
-        box_public.set_icon(this.p.carrot.user.icon_user_status);
+        box_edit = p.carrot.Create_Box();
+        box_edit.set_title("Change status MIDI (" + data["name"].ToString() + ")");
+        box_edit.set_icon(this.p.carrot.user.icon_user_status);
 
-        Carrot_Box_Item item_category = box_public.create_item();
+        item_category = box_edit.create_item();
         item_category.set_icon(this.p.carrot.icon_carrot_all_category);
         item_category.set_title("Category");
         item_category.set_tip("Select category for MIDI");
         item_category.set_type(Box_Item_Type.box_value_input);
         item_category.check_type();
 
-        Carrot_Box_Item item_status = box_public.create_item();
+        Carrot_Box_Btn_Item btn_sel_cat = item_category.create_item();
+        btn_sel_cat.set_icon(this.icon_list_category);
+        btn_sel_cat.set_color(p.carrot.color_highlight);
+        btn_sel_cat.set_act(() => this.Show_list_category(this.Select_Category_for_Edit));
+
+        Carrot_Box_Item item_status = box_edit.create_item();
         item_status.set_icon(this.p.carrot.user.icon_user_info);
         item_status.set_title("Status");
         item_status.set_tip("Select status for MIDI");
@@ -399,7 +434,7 @@ public class midi_list : MonoBehaviour
         if (s_status == "public") item_status.set_val("1");
         if (s_status == "sell") item_status.set_val("2");
 
-        Carrot_Box_Btn_Panel panel_btn = box_public.create_panel_btn();
+        Carrot_Box_Btn_Panel panel_btn = box_edit.create_panel_btn();
         Carrot_Button_Item btn_done=panel_btn.create_btn();
         btn_done.set_act_click(() => Act_change_status_midi(data, item_status.get_val(),item_category.get_val()));
         btn_done.set_label(PlayerPrefs.GetString("done", "Done"));
@@ -407,10 +442,17 @@ public class midi_list : MonoBehaviour
         btn_done.set_icon(p.carrot.icon_carrot_done);
 
         Carrot_Button_Item btn_cancel=panel_btn.create_btn();
-        btn_cancel.set_act_click(() => box_public.close());
+        btn_cancel.set_act_click(() => box_edit.close());
         btn_cancel.set_label(PlayerPrefs.GetString("cancel", "Cancel"));
         btn_cancel.set_bk_color(p.carrot.color_highlight);
         btn_cancel.set_icon(p.carrot.icon_carrot_cancel);
+    }
+
+    private void Select_Category_for_Edit(string s_name_category)
+    {
+        p.carrot.play_sound_click();
+        this.item_category.set_val(s_name_category);
+        if (box_category != null) box_category.close();
     }
 
     private void Act_change_status_midi(IDictionary data,string s_status,string s_category)
@@ -430,5 +472,7 @@ public class midi_list : MonoBehaviour
     {
         p.carrot.hide_loading();
         p.carrot.show_msg("Midi (Dev)", "Change status success!", Msg_Icon.Success);
+        if (box_list_midi != null) box_list_midi.close();
+        if (box_edit != null) box_edit.close();
     }
 }

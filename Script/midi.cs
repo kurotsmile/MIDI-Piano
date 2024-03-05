@@ -532,7 +532,6 @@ public class midi : MonoBehaviour
     {
         s_data = s_data.Replace("\n", " ");
         if (box_inp != null) box_inp.close();
-        p.carrot.show_msg(s_data);
         string[] arr_key=s_data.Split(" ");
 
         foreach(string s in arr_key)
@@ -540,7 +539,7 @@ public class midi : MonoBehaviour
             if (s.IndexOf("[") > -1)
             {
                 add_col_midi();
-                var s_note_midi_group = s.Substring(s.IndexOf("[") + 1, s.IndexOf("]"));
+                string s_note_midi_group = s.Substring(s.IndexOf("[") + 1, s.IndexOf("]")-1);
                 Add_col_midi_buy_group_midi_note(s_note_midi_group);
             }
             else
@@ -549,6 +548,7 @@ public class midi : MonoBehaviour
             }
             add_col_midi();
         }
+        p.carrot.show_msg("Midi", "Import midi success!", Msg_Icon.Success);
     }
 
     private void Add_col_midi_buy_group_midi_note(string s_note_group)
