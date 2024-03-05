@@ -1,3 +1,4 @@
+using Carrot;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,21 +6,22 @@ public class musical_instruments_manager : MonoBehaviour
 {
     [Header("Obj Main")]
     public piano p;
+
     [Header("Obj Musical Instruments")]
     public Image img_musical_instruments;
     public GameObject[] obj_musical_instruments_data;
-    public GameObject musical_instruments_item_prefab;
     private int sel_musical_instruments = -1;
     private int index_buy_musical_instruments = -1;
     private int index_rewarded_musical_instruments = -1;
 
     private string s_name_instruments;
-    private Carrot.Carrot_Box box_musical_instruments;
+    private Carrot_Box box_musical_instruments;
+    private Carrot_Window_Msg msg_musical_instruments = null;
 
     public void Load_musical_instruments()
     {
         this.sel_musical_instruments = PlayerPrefs.GetInt("sel_musical_instruments",0);
-        this.load_musical_instruments_by_index(this.sel_musical_instruments);
+        this.Load_musical_instruments_by_index(this.sel_musical_instruments);
     }
 
     public void show_list_musical_instruments()
@@ -27,42 +29,75 @@ public class musical_instruments_manager : MonoBehaviour
         this.box_musical_instruments=p.carrot.Create_Box(PlayerPrefs.GetString("musical_instruments","Musical Instruments"), img_musical_instruments.sprite);
         for (int i = 0; i < obj_musical_instruments_data.Length; i++)
         {
-            GameObject item_m = Instantiate(this.musical_instruments_item_prefab);
-            item_m.transform.SetParent(box_musical_instruments.area_all_item);
-            item_m.transform.localPosition = new Vector3(item_m.transform.localPosition.x, item_m.transform.localPosition.y, item_m.transform.localPosition.z);
-            item_m.transform.localScale = new Vector3(1f, 1f, 1f);
+            var index = i;
             musical_instruments_data m_data = obj_musical_instruments_data[i].GetComponent<musical_instruments_data>();
-            musical_instruments_item m_emp = item_m.GetComponent<musical_instruments_item>();
-            m_emp.img_icon.sprite = m_data.icon;
-            m_emp.txt_name.text= m_data.s_name;
-            m_emp.index = i;
-            m_emp.is_buy = m_data.is_buy;
-            if (this.sel_musical_instruments == i) item_m.GetComponent<Image>().color = p.carrot.color_highlight;
-            if (m_data.is_buy)
+            Carrot_Box_Item item_instruments = this.box_musical_instruments.create_item();
+            item_instruments.set_icon(m_data.icon);
+            item_instruments.set_title(m_data.s_name);
+            
+            bool is_buy = m_data.is_buy;
+            if (PlayerPrefs.GetInt("musical_instruments_" + i, 0) == 1) is_buy = false;
+            
+            if (is_buy)
             {
-                if(PlayerPrefs.GetInt("musical_instruments_"+i, 0) == 0)
+                item_instruments.set_act(() => p.buy_musical_instruments(index));
+                item_instruments.set_tip("Buy to use");
+
+                if (p.carrot.os_app != OS.Window)
                 {
-                    m_emp.obj_btn.SetActive(true);
+                    Carrot_Box_Btn_Item btn_ads = item_instruments.create_item();
+                    btn_ads.set_icon(this.p.icon_ads_gift);
+                    btn_ads.set_color(p.carrot.color_highlight);
+                    btn_ads.set_act(() => Get_rewarded(index));
                 }
-                else
-                {
-                    m_emp.obj_btn.SetActive(false);
-                }   
+
+                Carrot_Box_Btn_Item btn_buy = item_instruments.create_item();
+                btn_buy.set_icon(this.p.icon_buy);
+                btn_buy.set_color(p.carrot.color_highlight);
+                Destroy(btn_buy.GetComponent<Button>());
             }
             else
-                m_emp.obj_btn.SetActive(false);
+            {
+                item_instruments.set_act(() => Select_musical_instruments(index));
+                item_instruments.set_tip("Free");
+            }
+
+            if (this.sel_musical_instruments == i)
+            {
+                item_instruments.GetComponent<Image>().color = p.carrot.color_highlight;
+                item_instruments.txt_tip.color = Color.white;
+            }
         }
+        this.box_musical_instruments.update_color_table_row();
     }
 
-    public void select_musical_instruments(int index_m)
+    public void Get_rewarded(int index)
+    {
+        this.index_rewarded_musical_instruments = index;
+        this.msg_musical_instruments =p.carrot.show_msg(PlayerPrefs.GetString("musical_instruments", "Musical Instruments"), PlayerPrefs.GetString("rewarded_ads_tip", "Watch an ad to get a bonus for this instrument?"), Get_rewarded_yes, Get_rewarded_no);
+    }
+
+    private void Get_rewarded_yes()
+    {
+        if (this.msg_musical_instruments != null) this.msg_musical_instruments.close();
+        p.musical_instruments.set_index_ads_rewarded_instruments(this.index_rewarded_musical_instruments);
+        p.carrot.ads.show_ads_Rewarded();
+    }
+
+    private void Get_rewarded_no()
+    {
+        if (this.msg_musical_instruments != null) this.msg_musical_instruments.close();
+    }
+
+    public void Select_musical_instruments(int index_m)
     {
         PlayerPrefs.SetInt("sel_musical_instruments", index_m);
         this.sel_musical_instruments = index_m;
-        this.load_musical_instruments_by_index(index_m);
+        this.Load_musical_instruments_by_index(index_m);
         p.carrot.close();
     }
 
-    private void load_musical_instruments_by_index(int index_m)
+    private void Load_musical_instruments_by_index(int index_m)
     {
         musical_instruments_data m_data = obj_musical_instruments_data[index_m].GetComponent<musical_instruments_data>();
         for(int i = 0; i < p.note_black.Length; i++)
@@ -93,8 +128,9 @@ public class musical_instruments_manager : MonoBehaviour
         PlayerPrefs.SetInt("musical_instruments_"+this.index_buy_musical_instruments,1);
         if (this.index_buy_musical_instruments != -1)
         {
-            this.load_musical_instruments_by_index(this.index_buy_musical_instruments);
+            this.Load_musical_instruments_by_index(this.index_buy_musical_instruments);
             p.carrot.close();
+            this.index_buy_musical_instruments = -1;
         }
     }
 
@@ -102,7 +138,8 @@ public class musical_instruments_manager : MonoBehaviour
     {
         if (this.index_rewarded_musical_instruments != -1)
         {
-            this.load_musical_instruments_by_index(this.index_rewarded_musical_instruments);
+            this.Load_musical_instruments_by_index(this.index_rewarded_musical_instruments);
+            this.index_rewarded_musical_instruments = -1;
             if (this.box_musical_instruments != null) this.box_musical_instruments.close();
         }
     }

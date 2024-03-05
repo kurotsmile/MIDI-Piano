@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.UI;
 
@@ -23,6 +22,8 @@ public class piano : MonoBehaviour
     public Sprite icon_hide_txt;
     public Sprite icon_piano_txt;
     public Sprite icon_buy_list;
+    public Sprite icon_buy;
+    public Sprite icon_ads_gift;
     public Sprite icon_pc_txt;
     public Sprite icon_lock_key;
     public Sprite icon_unlock_key;

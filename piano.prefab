@@ -4258,6 +4258,8 @@ MonoBehaviour:
   icon_hide_txt: {fileID: 21300000, guid: a02bebb0b1eca124ca988a3f893842a8, type: 3}
   icon_piano_txt: {fileID: 21300000, guid: b10e0ee776b9e824abf0db5457403fe1, type: 3}
   icon_buy_list: {fileID: 21300000, guid: ff3edcf458287dd4fb09122cf79cf75d, type: 3}
+  icon_buy: {fileID: 21300000, guid: 2f0c9c3deb6989e4eb2bfbeb942705e5, type: 3}
+  icon_ads_gift: {fileID: 21300000, guid: d6615afeef77a774992a626de7781232, type: 3}
   icon_pc_txt: {fileID: 21300000, guid: 2d851541579fb5640a648e0ac1994573, type: 3}
   icon_lock_key: {fileID: 21300000, guid: 812873a138eeabe439d8c2a029c39249, type: 3}
   icon_unlock_key: {fileID: 21300000, guid: 0c17e749ba454bf439266cf3b721aa21, type: 3}
@@ -4474,6 +4476,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   p: {fileID: 7001318967239774822}
+  sp_icon_ads: {fileID: 21300000, guid: d6615afeef77a774992a626de7781232, type: 3}
   img_musical_instruments: {fileID: 2707054430369951617}
   obj_musical_instruments_data:
   - {fileID: 4544377597632438283, guid: 196fc3a3b262c9e4e8d540efdb8823eb, type: 3}
@@ -4482,8 +4485,6 @@ MonoBehaviour:
   - {fileID: 4544377597632438283, guid: f9f2047e3962b6649bce766014df0ccb, type: 3}
   - {fileID: 4544377597632438283, guid: fd23fa0d597dc064eba5c9a495239993, type: 3}
   - {fileID: 4544377597632438283, guid: 2b329038b88c0af49bb2612c4d7f9e88, type: 3}
-  musical_instruments_item_prefab: {fileID: 8202277148183749730, guid: 131245364d460c6458528720aa98582c,
-    type: 3}
 --- !u!114 &49863207559238561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19489,7 +19490,7 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
@@ -19499,12 +19500,12 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
@@ -19554,7 +19555,7 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -28
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
