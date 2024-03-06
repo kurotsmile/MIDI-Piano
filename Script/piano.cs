@@ -131,13 +131,14 @@ public class piano : MonoBehaviour
             m.Close();
             carrot.set_no_check_exit_app();
         }
+        else if (metro.panel_metronome.activeInHierarchy)
+        {
+            metro.panel_metronome.SetActive(false);
+            carrot.set_no_check_exit_app();
+        }
         else
         {
-            if (metro.panel_metronome.activeInHierarchy)
-            {
-                metro.panel_metronome.SetActive(false);
-                carrot.set_no_check_exit_app();
-            }
+            set_use_keyboar_pc();
         }
     }
 
@@ -145,7 +146,6 @@ public class piano : MonoBehaviour
     {
         if (this.is_used_keyboar)
         {
-
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             {
                 for (int i = 0; i < this.note_black.Length; i++)
@@ -355,6 +355,7 @@ public class piano : MonoBehaviour
 
     public void show_setting()
     {
+        set_no_use_keyboar_pc();
         this.carrot.ads.show_ads_Interstitial();
         Carrot.Carrot_Box box_setting=this.carrot.Create_Setting();
 
