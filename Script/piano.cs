@@ -384,7 +384,7 @@ public class piano : MonoBehaviour
     public void show_list_online_by_user_login()
     {
         this.carrot.play_sound_click();
-        this.GetComponent<midi_list>().show_list_buy_user_id(carrot.user.get_id_user_login());
+        this.m_list.show_list_by_user_id(carrot.user.get_id_user_login());
     }
 
     public void btn_show_account_login()
@@ -425,7 +425,7 @@ public class piano : MonoBehaviour
         if (s_id_product == carrot.shop.get_id_by_index(0))
         {
             carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("in_app_midi_success", "Thank you for your purchase, now you can use MIDI"));
-            m_list.get_midi_by_id(id_midi_online_buy);
+            m_list.On_buy_success();
         }
 
         if (s_id_product == carrot.shop.get_id_by_index(2))

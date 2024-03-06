@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum Type_List_MIDI {Pending,Public}
+public enum Type_List_MIDI {Pending,Public,Search}
 
 public class midi_list : MonoBehaviour
 {
@@ -28,6 +28,8 @@ public class midi_list : MonoBehaviour
     private Carrot_Box box_category;
     private Carrot_Box box_edit;
     private Type_List_MIDI type;
+
+    private IDictionary data_buy_midi =null;
     private string s_data_list_midi_public = "";
     private string s_title_box;
 
@@ -89,10 +91,16 @@ public class midi_list : MonoBehaviour
     {
         var id_midi = data["id"].ToString();
 
+        bool buy=false;
         Carrot_Box_Item item_m = box.create_item("Item_m_"+id_midi);
         item_m.set_title(data["name"].ToString());
         item_m.set_tip(data["id"].ToString());
-        item_m.set_act(() => Open_midi_editor_by_data(data));
+
+        if (data["buy"] != null)
+        {
+            if (data["buy"].ToString()=="0") buy=false;
+            else buy = true;
+        }
 
         string s_status = data["status"].ToString();
         if (s_status == "offline")
@@ -108,6 +116,8 @@ public class midi_list : MonoBehaviour
             btn_del.set_icon(p.carrot.sp_icon_del_data);
             btn_del.set_color(p.carrot.color_highlight);
             btn_del.set_act(() => Delete(int.Parse(data["index"].ToString())));
+
+            item_m.set_act(() => Open_midi_editor_by_data(data));
         }
         else
         {
@@ -116,10 +126,24 @@ public class midi_list : MonoBehaviour
             else
                 item_m.set_icon(this.icon_pendding);
 
-            Carrot_Box_Btn_Item btn_download = item_m.create_item();
-            btn_download.set_icon(this.p.carrot.icon_carrot_download);
-            btn_download.set_color(p.carrot.color_highlight);
-            btn_download.set_act(() => Download_midi(data));
+            if (buy)
+            {
+                Carrot_Box_Btn_Item btn_buy = item_m.create_item();
+                btn_buy.set_icon(p.icon_buy);
+                btn_buy.set_color(p.carrot.color_highlight);
+                btn_buy.set_act(() =>Buy_midi(data));
+
+                item_m.set_act(() => Buy_midi(data));
+            }
+            else
+            {
+                Carrot_Box_Btn_Item btn_download = item_m.create_item();
+                btn_download.set_icon(this.p.carrot.icon_carrot_download);
+                btn_download.set_color(p.carrot.color_highlight);
+                btn_download.set_act(() => Download_midi(data));
+
+                item_m.set_act(() => Open_midi_editor_by_data(data));
+            }
         }
 
         Carrot_Box_Btn_Item btn_export = item_m.create_item();
@@ -154,6 +178,8 @@ public class midi_list : MonoBehaviour
 
     private void Act_done_search(string s_data)
     {
+        p.carrot.show_loading();
+        type = Type_List_MIDI.Search;
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
         q.Add_where("name", Query_OP.EQUAL, s_data.ToLower());
         p.carrot.server.Get_doc(q.ToJson(), this.Act_get_list_midi_online_done,Act_fail);
@@ -225,7 +251,7 @@ public class midi_list : MonoBehaviour
         p.carrot.server.Get_doc(q.ToJson(), Act_get_list_midi_online_done);
     }
 
-    public void show_list_buy_user_id(string s_user_id)
+    public void show_list_by_user_id(string s_user_id)
     {
         p.carrot.show_loading();
         s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
@@ -566,5 +592,22 @@ public class midi_list : MonoBehaviour
         p.carrot.show_msg("Midi (Dev)", "Change status success!", Msg_Icon.Success);
         if (box_list_midi != null) box_list_midi.close();
         if (box_edit != null) box_edit.close();
+    }
+
+    public void Buy_midi(IDictionary data_midi)
+    {
+        this.data_buy_midi = data_midi;
+        p.carrot.shop.buy_product(0);
+    }
+
+    public void On_buy_success()
+    {
+        if (this.data_buy_midi != null)
+        {
+            PlayerPrefs.GetInt("buy_midi_" + data_buy_midi["id"].ToString(), 1);
+            this.Open_midi_editor_by_data(this.data_buy_midi);
+            this.data_buy_midi=null;
+            if (box_list_midi != null) box_list_midi.close();
+        }
     }
 }

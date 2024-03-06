@@ -4363,7 +4363,6 @@ MonoBehaviour:
   icon_pendding: {fileID: 21300000, guid: 973b2a4c7c325c44ebbfadb849f4a16d, type: 3}
   icon_list_online: {fileID: 21300000, guid: d6b1ac2c1a5d4f348a3d90a53979a921, type: 3}
   icon_list_category: {fileID: 21300000, guid: 5c559acd88e04a2448ee8ba087c55f9d, type: 3}
-  icon_midi_buy: {fileID: 21300000, guid: 2f0c9c3deb6989e4eb2bfbeb942705e5, type: 3}
   icon_upload: {fileID: 21300000, guid: 1dc5cc75de8f1e840a9381cb3d0015cc, type: 3}
   icon_export: {fileID: 21300000, guid: 1b7ef3ba2bdf1fe46ad5dbe0d8aa7834, type: 3}
 --- !u!114 &9082111594301685719
@@ -4476,7 +4475,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   p: {fileID: 7001318967239774822}
-  sp_icon_ads: {fileID: 21300000, guid: d6615afeef77a774992a626de7781232, type: 3}
   img_musical_instruments: {fileID: 2707054430369951617}
   obj_musical_instruments_data:
   - {fileID: 4544377597632438283, guid: 196fc3a3b262c9e4e8d540efdb8823eb, type: 3}
@@ -19490,7 +19488,7 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
@@ -19500,12 +19498,12 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
@@ -19555,7 +19553,7 @@ PrefabInstance:
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -28
       objectReference: {fileID: 0}
     - target: {fileID: 7785693657376435193, guid: c48f5a16ba2019c4a854f5bacf9586b0,
         type: 3}
