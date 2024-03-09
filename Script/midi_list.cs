@@ -98,8 +98,17 @@ public class midi_list : MonoBehaviour
 
         if (data["buy"] != null)
         {
-            if (data["buy"].ToString()=="0") buy=false;
-            else buy = true;
+            if (data["buy"].ToString() == "0")
+            {
+                buy = false;
+            }
+            else
+            {
+                if (PlayerPrefs.GetInt("buy_midi_" + id_midi, 0) == 1)
+                    buy = false;
+                else
+                    buy = true;
+            }
         }
 
         string s_status = data["status"].ToString();
@@ -604,7 +613,7 @@ public class midi_list : MonoBehaviour
     {
         if (this.data_buy_midi != null)
         {
-            PlayerPrefs.GetInt("buy_midi_" + data_buy_midi["id"].ToString(), 1);
+            PlayerPrefs.SetInt("buy_midi_" + data_buy_midi["id"].ToString(), 1);
             this.Open_midi_editor_by_data(this.data_buy_midi);
             this.data_buy_midi=null;
             if (box_list_midi != null) box_list_midi.close();
