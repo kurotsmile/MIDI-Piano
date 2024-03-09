@@ -464,7 +464,7 @@ public class midi : MonoBehaviour
         {
             string fullPath = Path.Combine(Application.persistentDataPath, data["name"].ToString() + ".mid");
             WriteMidiFile(fullPath, midiEvents);
-            p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi drafting"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!") + "\n" + fullPath, Carrot.Msg_Icon.Success);
+            p.carrot.show_msg(PlayerPrefs.GetString("midi_editor", "Midi Editor"), PlayerPrefs.GetString("export_file_midi_success", "Exported midi editor (.midi) file successfully!") + "\n" + fullPath, Carrot.Msg_Icon.Success);
         }
         else
         {
@@ -523,7 +523,7 @@ public class midi : MonoBehaviour
     public void Btn_import_by_text()
     {
         p.set_no_use_keyboar_pc();
-        box_inp=this.p.carrot.show_input("Import Midi By Text Code", "Enter code","");
+        box_inp=this.p.carrot.show_input(PlayerPrefs.GetString("midi_import", "Import Midi"), PlayerPrefs.GetString("midi_import_code", "Import Midi By Text Code"), "");
         box_inp.set_act_done(this.Act_import_midi_code);
     }
 
@@ -547,7 +547,7 @@ public class midi : MonoBehaviour
             }
             add_col_midi();
         }
-        p.carrot.show_msg("Midi", "Import midi success!", Msg_Icon.Success);
+        p.carrot.show_msg(PlayerPrefs.GetString("midi_import", "Import Midi"), PlayerPrefs.GetString("midi_import_success", "Import MIDI data successfully!"), Msg_Icon.Success);
     }
 
     private void Add_col_midi_buy_group_midi_note(string s_note_group)
