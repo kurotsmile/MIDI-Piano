@@ -66,7 +66,7 @@ public class midi_list : MonoBehaviour
         {
             this.box_list_midi=p.carrot.Create_Box(PlayerPrefs.GetString("list_midi_your", "Your Midi list"), icon);
             bool is_list_true = false;
-            for (int i = 0; i < leng_midi; i++)
+            for (int i = leng_midi-1; i >=0; i--)
             {
                 string s_data = PlayerPrefs.GetString("m_data_" + i, "");
                 if (s_data != "")
@@ -153,6 +153,17 @@ public class midi_list : MonoBehaviour
 
                 item_m.set_act(() => Open_midi_editor_by_data(data));
             }
+
+            if (data["user_id"] != null)
+            {
+                string user_id = data["user_id"].ToString();
+                string user_lang = data["user_lang"].ToString();
+                Carrot_Box_Btn_Item btn_user = item_m.create_item();
+                btn_user.set_icon(p.carrot.user.icon_user_login_true);
+                btn_user.set_color(p.carrot.color_highlight);
+                btn_user.set_act(() => p.carrot.user.show_user_by_id(user_id, user_lang));
+            }
+
         }
 
         Carrot_Box_Btn_Item btn_export = item_m.create_item();

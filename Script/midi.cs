@@ -351,7 +351,7 @@ public class midi : MonoBehaviour
 
         IDictionary data = (IDictionary)Json.Deserialize("{}");
         data["id"]="midi" + p.carrot.generateID();
-        data["name"] = inp_name_midi.text;
+        data["name"] = inp_name_midi.text.ToLower();
         data["speed"] = speed.ToString();
         data["data_type"] = s_data_type;
         data["data_index"] = s_data_index;
@@ -560,16 +560,17 @@ public class midi : MonoBehaviour
             }
         }
 
-        for (var i = 0; i <this.list_midi_line.Count; i++)
+        for (var i = 0; i <s_note_group.Length; i++)
         {
-            IDictionary data_n = this.Get_note_data_by_key(s_note_group[i].ToString());
-            if (data_n != null)
-            {
-                midi_note n = get_midi_note_by_point(this.length_midi_note - 1, i);
-                n.type_note_piano = int.Parse(data_n["type"].ToString());
-                n.index_note_piano = int.Parse(data_n["index"].ToString());
-                n.txt.text = data_n["key"].ToString();
-            }
+
+                IDictionary data_n = this.Get_note_data_by_key(s_note_group[i].ToString());
+                if (data_n != null)
+                {
+                    midi_note n = get_midi_note_by_point(this.length_midi_note - 1, i);
+                    n.type_note_piano = int.Parse(data_n["type"].ToString());
+                    n.index_note_piano = int.Parse(data_n["index"].ToString());
+                    n.txt.text = data_n["key"].ToString();
+                }
         }
     }
 
