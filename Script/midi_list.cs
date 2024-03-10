@@ -2,9 +2,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Networking;
 
-public enum Type_List_MIDI {Pending,Public,Search}
+public enum Type_List_MIDI {Pending,Public,Search,Category}
 
 public class midi_list : MonoBehaviour
 {
@@ -18,6 +17,7 @@ public class midi_list : MonoBehaviour
     public Sprite icon_list_category;
     public Sprite icon_upload;
     public Sprite icon_export;
+    public int index_buy_list_midi = 2;
 
     private int leng_midi = 0;
     private Carrot_Box box_list_midi;
@@ -29,17 +29,24 @@ public class midi_list : MonoBehaviour
     private Carrot_Box_Item item_edit_status;
     private Carrot_Box box_category;
     private Carrot_Box box_edit;
+    private Carrot_Box_Btn_Item btn_buy_list;
     private Carrot_Window_Input box_search;
     private Type_List_MIDI type;
 
     private IDictionary data_buy_midi =null;
     private string s_data_list_midi_public = "";
     private string s_title_box;
+    private bool is_buy_list = false;
 
     public void Check_midi()
     {
         leng_midi = PlayerPrefs.GetInt("leng_m");
         if (p.carrot.is_offline()) s_data_list_midi_public = PlayerPrefs.GetString("s_data_list_midi_public");
+
+        if (PlayerPrefs.GetInt("buy_list",0) == 0)
+            is_buy_list = false;
+        else
+            is_buy_list = true;
     }
 
     public void Save_midi(IDictionary data)
@@ -102,18 +109,25 @@ public class midi_list : MonoBehaviour
         else
             item_m.set_tip(data["id"].ToString());
 
-        if (data["buy"] != null)
+        if (this.is_buy_list)
         {
-            if (data["buy"].ToString() == "0")
+            buy = false;
+        }
+        else
+        {
+            if (data["buy"] != null)
             {
-                buy = false;
-            }
-            else
-            {
-                if (PlayerPrefs.GetInt("buy_midi_" + id_midi, 0) == 1)
+                if (data["buy"].ToString() == "0")
+                {
                     buy = false;
+                }
                 else
-                    buy = true;
+                {
+                    if (PlayerPrefs.GetInt("buy_midi_" + id_midi, 0) == 1)
+                        buy = false;
+                    else
+                        buy = true;
+                }
             }
         }
 
@@ -171,11 +185,6 @@ public class midi_list : MonoBehaviour
             }
 
         }
-
-        Carrot_Box_Btn_Item btn_export = item_m.create_item();
-        btn_export.set_icon(icon_export);
-        btn_export.set_color(p.carrot.color_highlight);
-        btn_export.set_act(() => p.m.Export_midi_by_data(data));
 
         if (p.carrot.model_app == ModelApp.Develope)
         {
@@ -336,6 +345,12 @@ public class midi_list : MonoBehaviour
             {
                 Carrot_Box_Btn_Item btn_pending = this.box_list_midi.create_btn_menu_header(icon_pendding);
                 btn_pending.set_act(() => this.show_list_pending_midi());
+
+                if (this.is_buy_list == false)
+                {
+                    btn_buy_list = this.box_list_midi.create_btn_menu_header(p.carrot.icon_carrot_buy);
+                    btn_buy_list.set_act(() => this.Buy_list_midi());
+                }
             }
 
             if (type == Type_List_MIDI.Pending)
@@ -486,6 +501,8 @@ public class midi_list : MonoBehaviour
 
     private void Show_list_midi_by_category(string name_category)
     {
+        type = Type_List_MIDI.Category;
+        if (box_category != null) box_category.close();
         s_title_box = name_category;
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
         q.Add_where("category", Query_OP.EQUAL, name_category);
@@ -650,6 +667,11 @@ public class midi_list : MonoBehaviour
         p.carrot.shop.buy_product(0);
     }
 
+    public void Buy_list_midi()
+    {
+        p.carrot.shop.buy_product(this.index_buy_list_midi);
+    }
+
     public void On_buy_success()
     {
         if (this.data_buy_midi != null)
@@ -659,5 +681,12 @@ public class midi_list : MonoBehaviour
             this.data_buy_midi=null;
             if (box_list_midi != null) box_list_midi.close();
         }
+    }
+
+    public void On_buy_list_success()
+    {
+        this.is_buy_list = true;
+        PlayerPrefs.SetInt("buy_list", 1);
+        if (btn_buy_list != null) Destroy(btn_buy_list);
     }
 }

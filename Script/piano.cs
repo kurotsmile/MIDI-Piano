@@ -53,6 +53,8 @@ public class piano : MonoBehaviour
 
     private void Start()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         link_deep_app = Application.absoluteURL;
         Application.deepLinkActivated += onDeepLinkActivated;
 
@@ -429,10 +431,10 @@ public class piano : MonoBehaviour
             m_list.On_buy_success();
         }
 
-        if (s_id_product == carrot.shop.get_id_by_index(2))
+        if (s_id_product == carrot.shop.get_id_by_index(m_list.index_buy_list_midi))
         {
             carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("in_app_list_success", "Thank you for your purchase, Now you can use all the midi songs in the online playlist"));
-            act_inapp_list_midi();
+            m_list.On_buy_list_success();
         }
 
         if (s_id_product == carrot.shop.get_id_by_index(3))
@@ -447,13 +449,8 @@ public class piano : MonoBehaviour
         for (int i = 0; i < arr_id.Length; i++)
         {
             string s_id_product = arr_id[i];
-            if (s_id_product == carrot.shop.get_id_by_index(2)) act_inapp_list_midi();
+            if (s_id_product == carrot.shop.get_id_by_index(this.m_list.index_buy_list_midi)) m_list.On_buy_list_success();
         }
-    }
-
-    private void act_inapp_list_midi()
-    {
-        PlayerPrefs.SetInt("buy_list", 1);
     }
 
     private void act_inapp_instruments()
