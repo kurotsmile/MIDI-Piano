@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Networking;
 
 public enum Type_List_MIDI {Pending,Public,Search}
 
@@ -24,9 +25,11 @@ public class midi_list : MonoBehaviour
     private Carrot_Box_Item item_edit_name;
     private Carrot_Box_Item item_edit_category;
     private Carrot_Box_Item item_edit_buy;
+    private Carrot_Box_Item item_edit_author;
     private Carrot_Box_Item item_edit_status;
     private Carrot_Box box_category;
     private Carrot_Box box_edit;
+    private Carrot_Window_Input box_search;
     private Type_List_MIDI type;
 
     private IDictionary data_buy_midi =null;
@@ -94,7 +97,10 @@ public class midi_list : MonoBehaviour
         bool buy=false;
         Carrot_Box_Item item_m = box.create_item("Item_m_"+id_midi);
         item_m.set_title(data["name"].ToString());
-        item_m.set_tip(data["id"].ToString());
+        if (data["author"] != null)
+            item_m.set_tip(data["author"].ToString());
+        else
+            item_m.set_tip(data["id"].ToString());
 
         if (data["buy"] != null)
         {
@@ -174,7 +180,12 @@ public class midi_list : MonoBehaviour
         if (p.carrot.model_app == ModelApp.Develope)
         {
             if (s_status != "offline")
-            {
+            {               
+                Carrot_Box_Btn_Item btn_search = item_m.create_item();
+                btn_search.set_icon(p.carrot.icon_carrot_search);
+                btn_search.set_color(p.carrot.color_highlight);
+                btn_search.set_act(() => Open_link_search_name(data["name"].ToString()));
+
                 Carrot_Box_Btn_Item btn_change_status = item_m.create_item();
                 btn_change_status.set_icon(p.carrot.icon_carrot_write);
                 btn_change_status.set_color(p.carrot.color_highlight);
@@ -190,14 +201,23 @@ public class midi_list : MonoBehaviour
         return item_m;
     }
 
+    private void Open_link_search_name(string s_name)
+    {
+        string s_search = "https://www.google.com/search?q=" +s_name;
+        p.carrot.play_sound_click();
+        Application.OpenURL(s_search);
+    }
+
     public void func_search()
     {
         p.set_no_use_keyboar_pc();
-        p.carrot.show_search( Act_done_search, PlayerPrefs.GetString("search_midi_tip", "You can Search for midi songs online, for reference and use for composition purposes"));
+        this.box_search=p.carrot.show_search( Act_done_search, PlayerPrefs.GetString("search_midi_tip", "You can Search for midi songs online, for reference and use for composition purposes"));
     }
 
     private void Act_done_search(string s_data)
     {
+        s_title_box = s_data;
+        if (this.box_search != null) this.box_search.close();
         p.carrot.show_loading();
         type = Type_List_MIDI.Search;
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
@@ -551,14 +571,23 @@ public class midi_list : MonoBehaviour
 
         item_edit_buy = box_edit.create_item();
         item_edit_buy.set_icon(p.icon_buy);
-        item_edit_buy.set_type("Sell");
-        item_edit_buy.set_type("Set buy Midi");
+        item_edit_buy.set_title("Sell");
+        item_edit_buy.set_tip("Set buy Midi");
         item_edit_buy.set_type(Box_Item_Type.box_value_dropdown);
         item_edit_buy.check_type();
 
         item_edit_buy.dropdown_val.ClearOptions();
         item_edit_buy.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("Free"));
         item_edit_buy.dropdown_val.options.Add(new UnityEngine.UI.Dropdown.OptionData("Buy"));
+
+        item_edit_author = box_edit.create_item();
+        item_edit_author.set_icon(p.icon_buy);
+        item_edit_author.set_title("Author");
+        item_edit_author.set_tip("Author of the music composition");
+        item_edit_author.set_type(Box_Item_Type.box_value_input);
+        item_edit_author.check_type();
+
+        if (data["author"] != null) item_edit_author.set_val(data["author"].ToString());
 
         if (data["buy"] != null)
         {
@@ -599,6 +628,7 @@ public class midi_list : MonoBehaviour
         data["status"] = s_val_status;
         data["category"] = item_edit_category.get_val();
         data["buy"] = item_edit_buy.get_val();
+        data["author"] = item_edit_author.get_val();
         string s_json = p.carrot.server.Convert_IDictionary_to_json(data);
         p.carrot.show_loading();
         p.carrot.server.Add_Document_To_Collection(p.carrot.Carrotstore_AppId, data["id"].ToString(), s_json, Act_change_status_done, Act_fail);
