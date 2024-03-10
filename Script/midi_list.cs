@@ -29,7 +29,7 @@ public class midi_list : MonoBehaviour
     private Carrot_Box_Item item_edit_status;
     private Carrot_Box box_category;
     private Carrot_Box box_edit;
-    private Carrot_Box_Btn_Item btn_buy_list;
+    private Carrot_Box_Btn_Item btn_buy_list = null;
     private Carrot_Window_Input box_search;
     private Type_List_MIDI type;
 
@@ -687,6 +687,6 @@ public class midi_list : MonoBehaviour
     {
         this.is_buy_list = true;
         PlayerPrefs.SetInt("buy_list", 1);
-        if (btn_buy_list != null) Destroy(btn_buy_list);
+        if (btn_buy_list != null) Destroy(btn_buy_list.gameObject);
     }
 }

@@ -109,7 +109,7 @@ public class piano : MonoBehaviour
                 if (link_deep_app.Contains("show"))
                 {
                     string data_link = link_deep_app.Replace("midi://show/", "");
-                    GetComponent<midi_list>().get_midi_by_id(data_link);
+                    this.m_list.get_midi_by_id(data_link);
                     link_deep_app = "";
                 }
             }
@@ -442,6 +442,12 @@ public class piano : MonoBehaviour
             carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("in_app_instruments_success", "Thank you for your purchase, Now you can use all the midi songs in the online playlist"));
             act_inapp_instruments();
         }
+
+        if (s_id_product == carrot.shop.get_id_by_index(this.musical_instruments.index_buy_musical_all_instruments))
+        {
+            carrot.show_msg(PlayerPrefs.GetString("shop", "Shop"), PlayerPrefs.GetString("in_app_instruments_success", "Thank you for your purchase, Now you can use all the midi songs in the online playlist"));
+            this.musical_instruments.On_success_buy_all_musical_instruments();
+        }
     }
 
     public void restore_carrot_pay_success(string[] arr_id)
@@ -450,6 +456,7 @@ public class piano : MonoBehaviour
         {
             string s_id_product = arr_id[i];
             if (s_id_product == carrot.shop.get_id_by_index(this.m_list.index_buy_list_midi)) m_list.On_buy_list_success();
+            if (s_id_product == carrot.shop.get_id_by_index(this.musical_instruments.index_buy_musical_all_instruments)) musical_instruments.On_success_buy_all_musical_instruments();
         }
     }
 

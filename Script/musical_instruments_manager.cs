@@ -18,15 +18,31 @@ public class musical_instruments_manager : MonoBehaviour
     private Carrot_Box box_musical_instruments;
     private Carrot_Window_Msg msg_musical_instruments = null;
 
+    private bool is_buy_allinstrument = false;
+    public int index_buy_musical_all_instruments = 4;
+    private Carrot_Box_Btn_Item btn_buy_head = null;
+
     public void Load_musical_instruments()
     {
         this.sel_musical_instruments = PlayerPrefs.GetInt("sel_musical_instruments",0);
         this.Load_musical_instruments_by_index(this.sel_musical_instruments);
+
+        if (PlayerPrefs.GetInt("is_buy_allinstrument", 0) == 0)
+            is_buy_allinstrument = false;
+        else
+            is_buy_allinstrument = true;
     }
 
     public void show_list_musical_instruments()
     {
         this.box_musical_instruments=p.carrot.Create_Box(PlayerPrefs.GetString("musical_instruments","Musical Instruments"), img_musical_instruments.sprite);
+
+        if (!this.is_buy_allinstrument)
+        {
+            btn_buy_head = this.box_musical_instruments.create_btn_menu_header(this.p.carrot.icon_carrot_buy);
+            btn_buy_head.set_act(() => this.Buy_all_instrument());
+        }
+
         for (int i = 0; i < obj_musical_instruments_data.Length; i++)
         {
             var index = i;
@@ -36,7 +52,15 @@ public class musical_instruments_manager : MonoBehaviour
             item_instruments.set_title(m_data.s_name);
             
             bool is_buy = m_data.is_buy;
-            if (PlayerPrefs.GetInt("musical_instruments_" + i, 0) == 1) is_buy = false;
+            
+            if (this.is_buy_allinstrument)
+            {
+                is_buy = false;
+            }
+            else
+            {
+                if (PlayerPrefs.GetInt("musical_instruments_" + i, 0) == 1) is_buy = false;
+            }
             
             if (is_buy)
             {
@@ -134,6 +158,13 @@ public class musical_instruments_manager : MonoBehaviour
         }
     }
 
+    public void On_success_buy_all_musical_instruments()
+    {
+        PlayerPrefs.SetInt("is_buy_allinstrument", 1);
+        this.is_buy_allinstrument = true;
+        if (this.btn_buy_head != null) Destroy(this.btn_buy_head.gameObject);
+    }
+
     public void on_success_rewarded_musical_instruments()
     {
         if (this.index_rewarded_musical_instruments != -1)
@@ -147,5 +178,10 @@ public class musical_instruments_manager : MonoBehaviour
     public string get_name_instruments()
     {
         return this.s_name_instruments;
+    }
+
+    public void Buy_all_instrument()
+    {
+        this.p.carrot.buy_product(this.index_buy_musical_all_instruments);
     }
 }
