@@ -66,6 +66,7 @@ public class piano : MonoBehaviour
         this.ads.onRewardedSuccess+=Act_Rewarded_Success;
         this.carrot.game.act_click_watch_ads_in_music_bk=this.ads.ShowRewardedVideo;
         this.carrot.act_after_delete_all_data=this.delete_all_data;
+        this.carrot.act_buy_ads_success=this.ads.RemoveAds;
 
         panel_menu_top.SetActive(true);
         panel_menu_mini.SetActive(true);
