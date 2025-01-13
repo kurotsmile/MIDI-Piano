@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.unity3d.player"
     xmlns:tools="http://schemas.android.com/tools">
     <application>
-        <!-- Activity chính -->
         <activity android:name="com.unity3d.player.UnityPlayerActivity"
                   android:theme="@style/UnityThemeSelector">
             <intent-filter>
@@ -10,17 +11,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
-        </activity>
-        
-        <!-- Activity phụ xử lý VIEW -->
-        <activity android:name="com.unity3d.player.UnityPlayerViewActivity"
-                  android:theme="@style/BaseUnityGameActivityTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="midi" android:host="show"/>
-            </intent-filter>
+        <intent-filter>
+          <action android:name="android.intent.action.VIEW"/>
+          <category android:name="android.intent.category.DEFAULT"/>
+          <category android:name="android.intent.category.BROWSABLE"/>
+          <data android:scheme="midi" android:host="show"/>
+        </intent-filter>
         </activity>
     </application>
 </manifest>
