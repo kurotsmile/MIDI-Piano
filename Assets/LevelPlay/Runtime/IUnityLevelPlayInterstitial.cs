@@ -3,6 +3,7 @@ using System;
 /// <summary>
 /// Interface representing LevelPlay's interstitial events
 /// </summary>
+[Obsolete("This class will be made private in version 9.0.0.")]
 public interface IUnityLevelPlayInterstitial
 {
     /// <summary>

@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Unity.Services.LevelPlay;
-using UnityEngine;
 
+[Obsolete("Please use LevelPlayImpressionData instead.")]
 /// <summary>
 /// Represents an impression event's data
 /// </summary>
 public class IronSourceImpressionData
 {
     public readonly string auctionId;
-    [Obsolete("This parameter will be removed in version 9.0.0. Please use the AdFormat parameter instead.")]
+    public readonly string CreativeId;
+    [Obsolete("Use the AdFormat parameter instead.")]
     public readonly string adUnit;
     public readonly string adFormat;
     public readonly string mediationAdUnitName;
@@ -48,6 +49,10 @@ public class IronSourceImpressionData
                 if (jsonDic.TryGetValue(IronSourceConstants.IMPRESSION_DATA_KEY_AUCTION_ID, out obj) && obj != null)
                 {
                     auctionId = obj.ToString();
+                }
+                if (jsonDic.TryGetValue(IronSourceConstants.k_ImpressionDataKeyCreativeID, out obj) && obj != null)
+                {
+                    CreativeId = obj.ToString();
                 }
                 if (jsonDic.TryGetValue(IronSourceConstants.IMPRESSION_DATA_KEY_AD_UNIT, out obj) && obj != null)
                 {
@@ -126,8 +131,10 @@ public class IronSourceImpressionData
 
     public override string ToString()
     {
+#pragma warning disable 0618
         return "IronSourceImpressionData{" +
             "auctionId='" + auctionId + '\'' +
+            ", creativeId='" + CreativeId + '\'' +
             ", adUnit='" + adUnit + '\'' +
             ", adFormat='" + adFormat + '\'' +
             ", mediationAdUnitName='" + mediationAdUnitName + '\'' +
@@ -145,5 +152,6 @@ public class IronSourceImpressionData
             ", encryptedCPM='" + encryptedCPM + '\'' +
             ", conversionValue=" + conversionValue +
             '}';
+#pragma warning restore 0618
     }
 }

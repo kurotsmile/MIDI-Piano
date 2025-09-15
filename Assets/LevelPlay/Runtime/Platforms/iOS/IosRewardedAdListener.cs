@@ -2,8 +2,9 @@
 using System;
 using System.Runtime.InteropServices;
 using AOT;
+using com.unity3d.mediation;
 
-namespace com.unity3d.mediation
+namespace Unity.Services.LevelPlay
 {
     class IosRewardedAdListener : IosNativeObject
     {
@@ -35,7 +36,7 @@ namespace com.unity3d.mediation
 
         delegate void DidDisplayWithAdInfo(IntPtr rewardedAd, string adInfoJson);
 
-        delegate void DidFailToDisplayWithAdInfo(IntPtr rewardedAd, string adInfoJson, String errorPtr);
+        delegate void DidFailToDisplayWithAdInfo(IntPtr rewardedAd, string adInfoJson, string errorPtr);
 
         delegate void DidAdRewardedWithAdInfo(IntPtr rewardedAd, string adInfoJson, string rewardName, int rewardAmount);
 
@@ -67,7 +68,7 @@ namespace com.unity3d.mediation
         }
 
         [MonoPInvokeCallback(typeof(DidFailToDisplayWithAdInfo))]
-        static void DisplayFailed(IntPtr ptr, string adInfoJson, String errorPtr)
+        static void DisplayFailed(IntPtr ptr, string adInfoJson, string errorPtr)
         {
             var rewardedAd = Get<IosRewardedAd>(ptr);
             rewardedAd?.InvokeFailedDisplayEvent(adInfoJson, errorPtr);

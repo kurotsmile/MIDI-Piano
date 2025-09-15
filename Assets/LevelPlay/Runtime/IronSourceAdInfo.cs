@@ -6,12 +6,18 @@ using Unity.Services.LevelPlay;
 /// <summary>
 /// Defines the information relative to an ad
 /// </summary>
+[Obsolete("Use LevelPlayAdInfo instead.")]
 public class IronSourceAdInfo
 {
     /// <summary>
     /// Auction ID.
     /// </summary>
     public readonly string auctionId;
+
+    /// <summary>
+    /// Creative ID.
+    /// </summary>
+    public readonly string creativeId;
 
     /// <summary>
     /// Ad Unit.
@@ -86,6 +92,10 @@ public class IronSourceAdInfo
                 {
                     auctionId = obj.ToString();
                 }
+                if (jsonDic.TryGetValue(IronSourceConstants.k_ImpressionDataKeyCreativeID, out obj) && obj != null)
+                {
+                    creativeId = obj.ToString();
+                }
                 if (jsonDic.TryGetValue(IronSourceConstants.IMPRESSION_DATA_KEY_AD_UNIT, out obj) && obj != null)
                 {
                     adUnit = obj.ToString();
@@ -148,6 +158,7 @@ public class IronSourceAdInfo
     {
         return "IronSourceAdInfo {" +
             "auctionId='" + auctionId + '\'' +
+            ", creativeId='" + creativeId + '\'' +
             ", adUnit='" + adUnit + '\'' +
             ", country='" + country + '\'' +
             ", ab='" + ab + '\'' +
