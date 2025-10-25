@@ -105,7 +105,7 @@ public class musical_instruments_manager : MonoBehaviour
     {
         if (this.msg_musical_instruments != null) this.msg_musical_instruments.close();
         p.musical_instruments.set_index_ads_rewarded_instruments(this.index_rewarded_musical_instruments);
-        p.ads.Show_ads_Interstitial();
+        p.ads.show_ads_Interstitial();
     }
 
     private void Get_rewarded_no()

@@ -168,7 +168,7 @@ public class piano : MonoBehaviour
 
     public void btn_change_type_note_txt()
     {
-        this.ads.Show_ads_Interstitial();
+        ads.show_ads_Interstitial();
         sel_show_text_type++;
         if (sel_show_text_type > 2) sel_show_text_type = 0;
         PlayerPrefs.SetInt("sel_show_text_type", sel_show_text_type);
@@ -186,7 +186,7 @@ public class piano : MonoBehaviour
 
     public void show_hide_effect_click()
     {
-        this.ads.Show_ads_Interstitial();
+        this.ads.show_ads_Interstitial();
         if (is_show_effect)
         {
             is_show_effect = false;
@@ -348,7 +348,7 @@ public class piano : MonoBehaviour
 
     public void show_metronome()
     {
-        this.ads.Show_ads_Interstitial();
+        this.ads.show_ads_Interstitial();
         this.carrot.play_sound_click();
         metro.show_setting();
     }
@@ -356,7 +356,7 @@ public class piano : MonoBehaviour
     public void show_setting()
     {
         set_no_use_keyboar_pc();
-        this.ads.Show_ads_Interstitial();
+        this.ads.show_ads_Interstitial();
         Carrot.Carrot_Box box_setting=this.carrot.Create_Setting();
 
         Carrot.Carrot_Box_Item setting_instruments = box_setting.create_item_of_top("list_midi");
@@ -390,7 +390,7 @@ public class piano : MonoBehaviour
 
     public void btn_show_account_login()
     {
-        this.ads.Show_ads_Interstitial();
+        this.ads.show_ads_Interstitial();
         is_used_keyboar = false;
         is_open_list_after_login = false;
         carrot.show_login();
@@ -483,7 +483,7 @@ public class piano : MonoBehaviour
         }
         else
         {
-            this.ads.Show_ads_Interstitial();
+            this.ads.show_ads_Interstitial();
             show_list_online_by_user_login();
         }
     }

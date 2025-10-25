@@ -425,7 +425,7 @@ public class midi : MonoBehaviour
         is_play = false;
         p.set_use_keyboar_pc();
         img_recod.color = Color.white;
-        p.ads.Show_ads_Interstitial();
+        p.ads.show_ads_Interstitial();
         p.ads.ShowBannerAd();
     }
 

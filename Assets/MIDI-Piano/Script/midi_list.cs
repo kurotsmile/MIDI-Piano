@@ -281,7 +281,7 @@ public class midi_list : MonoBehaviour
     public void show_list_download_midi()
     {
         type = Type_List_MIDI.Public;
-        p.ads.Show_ads_Interstitial();
+        p.ads.show_ads_Interstitial();
         s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
         q.Add_where("status", Query_OP.EQUAL, "public");
@@ -292,7 +292,7 @@ public class midi_list : MonoBehaviour
     private void show_list_pending_midi()
     {
         type = Type_List_MIDI.Pending;
-        p.ads.Show_ads_Interstitial();
+        p.ads.show_ads_Interstitial();
         s_title_box = PlayerPrefs.GetString("list_midi_online", "List Midi Online");
         StructuredQuery q = new(p.carrot.Carrotstore_AppId);
         q.Add_where("status", Query_OP.EQUAL, "pending");
@@ -414,7 +414,7 @@ public class midi_list : MonoBehaviour
     private void Show_list_category(UnityAction<string> act_done_sel)
     {
         this.act_sel_category = act_done_sel;
-        p.ads.ShowInterstitialAd();
+        p.ads.show_ads_Interstitial();
         StructuredQuery q = new("midi-category");
         p.carrot.server.Get_doc(q.ToJson(), Act_show_list_category, Act_fail);
     }
